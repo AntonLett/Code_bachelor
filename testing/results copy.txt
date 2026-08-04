@@ -1,0 +1,72 @@
+=== Performance Test: 10 Durchläufe ===
+Programm: ../executables/updater
+Start: Tue 04 Aug 2026 01:21:05 PM CEST
+
+--- Durchlauf 1 ---
+
+real	0m15.278s
+user	0m14.318s
+sys	0m0.950s
+
+--- Durchlauf 2 ---
+
+real	0m15.991s
+user	0m15.064s
+sys	0m0.919s
+
+--- Durchlauf 3 ---
+
+real	0m14.890s
+user	0m13.907s
+sys	0m0.976s
+
+--- Durchlauf 4 ---
+
+real	0m15.302s
+user	0m14.332s
+sys	0m0.961s
+
+--- Durchlauf 5 ---
+
+real	0m15.029s
+user	0m14.166s
+sys	0m0.855s
+
+--- Durchlauf 6 ---
+
+real	0m15.268s
+user	0m14.255s
+sys	0m1.004s
+
+--- Durchlauf 7 ---
+
+real	0m15.104s
+user	0m14.139s
+sys	0m0.959s
+
+--- Durchlauf 8 ---
+
+real	0m15.074s
+user	0m14.084s
+sys	0m0.984s
+
+--- Durchlauf 9 ---
+
+real	0m15.339s
+user	0m14.529s
+sys	0m0.800s
+
+--- Durchlauf 10 ---
+
+real	0m15.426s
+user	0m14.609s
+sys	0m0.809s
+
+Ende: Tue 04 Aug 2026 01:23:37 PM CEST
+
+=== Zusammenfassung ===
+Durchläufe: 10
+Durchschnitt: 0.000 Sekunden
+Minimum: 0.000 Sekunden
+Maximum: 0.000 Sekunden
+Schwankung: 0.000 Sekunden

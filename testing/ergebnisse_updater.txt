@@ -1,0 +1,42 @@
+TEST1
+beschreibung: Zweimal die gleiche Datei miteinander verglichen, d.h. identische Einträge, keine Veränderungen
+datei 1: /gpfs/scic/personal/lettowh/file.list.FileStatistics
+datei 2: /gpfs/scic/personal/lettowh/file.list.FileStatistics
+größe: 1709347686 Bytes oder etwa 1.7 GigaByte
+anzahl zeilen: 4867489
+Dauer: Comparing took: 15553.5 ms
+       Including writing to file it took: 15553.7 ms
+
+TEST2
+beschreibung: Zweimal die gleiche Datei miteinander verglichen, d.h. identische Einträge, keine Veränderungen
+datei 1: /gpfs/scic/personal/lettowh/file_list_laurent
+datei 2: /gpfs/scic/personal/lettowh/file_list_laurent
+größe: 16584428156 Bytes oder etwa 16GB
+anzahl zeilen: 50049049
+Dauer: Comparing took: 147690 ms    (etwa 2,5 Minuten)
+       Including writing to file it took: 147690 ms
+
+TEST3
+beschreibung: Vergleicht fast die gleiche datei miteinander, nur die erste zeile wurde aus der zweiten datei entfernt, sonst identisch
+datei 1: /gpfs/scic/personal/lettowh/file.list.FileStatistics_change
+datei 2: /gpfs/scic/personal/lettowh/change_sorted
+größe 1: 1709347686 Byte oder etwa 1.6GB
+größe 2: 1709347464 Byte oder etwa 1.6GB
+anzahl zeilen 1: 4867489
+anzahl zeilen 2: 4867488
+Dauer: Comparing took: 15166.9 ms
+       Including writing to file it took: 15167.3 ms
+
+TEST4
+beschreibung: Messung der dauer für das sortieren der datei
+datei: /gpfs/scic/personal/lettowh/file_list_laurent
+größe: 16584428156 Bytes oder etwa 16GB
+anzahl zeilen: 50049049
+Dauer: 2 Minuten57.133s
+Durchführung: time LC_ALL=C sort -k$(head -1 file_list_laurent | awk '{print NF}') -o laurent_sorted file_list_laurent 
+
+       real	2m57.133s
+       user	1m17.057s
+       sys	0m34.261s
+
+

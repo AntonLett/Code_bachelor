@@ -1,0 +1,82 @@
+=== Sorting Files ===
+--- File 1: /gpfs/scic/personal/lettowh/laurent.list.FileStatistics --- 
+real    3m1.466s
+user    0m46.119s
+sys     0m32.756s
+
+--- File 2: /gpfs/scic/personal/lettowh/schuman.list.FileStatistics --- 
+real    0m46.490s
+user    0m7.934s
+sys     0m5.848s
+
+=== Performance Test: 20 Durchläufe ===
+Programm: ../executables/updater
+Start: Tue 04 Aug 2026 04:31:49 PM CEST
+
+--- Durchlauf 1 ---
+
+real	1m43.581s
+user	1m27.615s
+sys	0m14.106s
+
+--- Durchlauf 2 ---
+
+real	1m45.361s
+user	1m32.476s
+sys	0m12.855s
+
+--- Durchlauf 3 ---
+
+real	1m47.882s
+user	1m29.835s
+sys	0m16.813s
+
+--- Durchlauf 4 ---
+
+real	1m44.668s
+user	1m29.415s
+sys	0m15.215s
+
+--- Durchlauf 5 ---
+
+real	1m52.559s
+user	1m36.855s
+sys	0m15.651s
+
+--- Durchlauf 6 ---
+
+real	1m43.703s
+user	1m28.881s
+sys	0m14.784s
+
+--- Durchlauf 7 ---
+
+real	1m46.817s
+user	1m28.833s
+sys	0m17.944s
+
+--- Durchlauf 8 ---
+
+real	1m52.945s
+user	1m34.798s
+sys	0m18.102s
+
+--- Durchlauf 9 ---
+
+real	1m45.625s
+user	1m28.703s
+sys	0m16.867s
+
+--- Durchlauf 10 ---
+
+real	1m46.772s
+user	1m29.148s
+sys	0m17.582s
+
+--- Durchlauf 11 ---
+
+real	1m44.772s
+user	1m27.876s
+sys	0m16.858s
+
+--- Durchlauf 12 ---
