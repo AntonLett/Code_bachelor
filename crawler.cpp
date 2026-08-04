@@ -14,13 +14,9 @@
 std::string SERVER_PORT{};
 std::string SERVER_IP{};
 std::mutex vector_mutex;
-std::mutex count_mutex;
 unsigned int file_count = 0;
 std::unordered_map<std::string, int> extension_count;
 std::vector<std::string> path_vector;
-const unsigned short PROCESSOR_COUNT = std::thread::hardware_concurrency();
-const unsigned short BATCH_SIZE = 50;
-const unsigned short MAX_TRIES = 5;
 const size_t MAX_SIZE = 4096;
 
 void send_data(const std::vector<std::string> &paths)
@@ -35,14 +31,18 @@ void send_data(const std::vector<std::string> &paths)
         std::string next_path = std::to_string(CREATE) + " " + path + "\n";
         if ((message + next_path).length() > MAX_SIZE)
         {
-            client->sendMessage(message);
+            response = client->sendMessage(message);
+            if (response != "ERROR sending failed")
+            {
+                std::cout << Color::info_message() << response << std::endl;
+            }
             message = "";
         }
         message += next_path;
     }
     if (message != "")
     {
-        client->sendMessage(message);
+        response = client->sendMessage(message);
     }
     if (response == "ERROR")
     {
@@ -136,10 +136,10 @@ int main(int argc, char *argv[])
         cb.start_crawl_pool();
         cb.wait_all();
         std::cout << Color::warning_message(std::to_string(path_vector.size())) << std::endl;
-        for (const auto &s : path_vector)
-        {
-            std::cout << Color::warning_message(s) << std::endl;
-        }
+        // for (const auto &s : path_vector)
+        // {
+        //     std::cout << Color::warning_message(s) << std::endl;
+        // }
         // write_to_file();
         if (!path_vector.empty())
         {

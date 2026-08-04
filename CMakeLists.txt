@@ -47,7 +47,7 @@ add_executable(typefinderV4
 target_link_libraries(typefinderV4 PUBLIC
     Threads::Threads
     libCZI
-    Boost
+    Boost::asio
 )
 target_compile_options(typefinderV4 PRIVATE -O3)
 

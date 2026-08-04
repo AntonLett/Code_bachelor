@@ -145,61 +145,69 @@ void handle_done(const std::vector<std::string> &paths)
 
 int handle_message(std::string message)
 {
-    std::unordered_map<int, std::vector<std::string>> event_map;
-    std::vector<std::string> files;
-    std::vector<std::string> paths;
-    std::stringstream ss(message);
-    std::string file;
-    if (!message.empty())
+    try
     {
-        while (std::getline(ss, file, '\n'))
+        std::unordered_map<int, std::vector<std::string>> event_map;
+        std::vector<std::string> files;
+        std::vector<std::string> paths;
+        std::stringstream ss(message);
+        std::string file;
+        if (!message.empty())
         {
-            files.push_back(file);
+            while (std::getline(ss, file, '\n'))
+            {
+                files.push_back(file);
+            }
+        }
+        for (std::string file : files)
+        {
+            if (file == "")
+            {
+                std::cerr << Color::warning_message() << "Empty file name, skipping.\n";
+                continue;
+            }
+            std::string delimiter = " ";
+            size_t pos = file.find(delimiter);
+
+            if (pos == std::string::npos)
+            {
+                std::cerr << Color::error_message() << " Message not in expected format!" << std::endl;
+                std::cerr << "File: " << file << std::endl;
+                ;
+                return 1;
+            }
+
+            int event = std::stoi(file.substr(0, pos)); // i.e. CREATE, MOVED_TO, ... (based on linux tool inotify)
+            if (pos + 1 > file.length())
+            {
+                std::cerr << Color::error_message() << " Invalid position for path extraction" << std::endl;
+                std::cerr << file << std::endl;
+                return 1;
+            }
+            std::string path = file.substr(pos + 1, file.length());
+
+            std::unordered_map<int, std::function<void(const std::vector<std::string> &)>>::const_iterator got = action_map.find(event);
+            if (got == action_map.end())
+            {
+                std::cerr << Color::error_message() << " EVENT not found." << std::endl;
+                std::cerr << event << std::endl;
+                return 1;
+            }
+            event_map[event].push_back(path);
+        }
+        for (const auto &[e, v] : event_map)
+        {
+            // pool_handle.detach_task(
+            //     [e,v]{
+            action_map.at(e)(v);
+            //     }
+            // );
         }
     }
-    for (std::string file : files)
+    catch (const std::exception &e)
     {
-        if (file == "")
-        {
-            std::cerr << Color::warning_message() << "Empty file name, skipping.\n";
-            continue;
-        }
-        std::string delimiter = " ";
-        size_t pos = message.find(delimiter);
-
-        if (pos == std::string::npos)
-        {
-            std::cerr << Color::error_message() << " Message not in expected format!" << std::endl;
-            std::cerr << "File: " << file << std::endl;
-            ;
-            return 1;
-        }
-
-        int event = std::stoi(file.substr(0, pos)); // i.e. CREATE, MOVED_TO, ... (based on linux tool inotify)
-        if (pos + 1 > file.length())
-        {
-            std::cerr << Color::error_message() << " Invalid position for path extraction" << std::endl;
-            std::cerr << file << std::endl;
-            return 1;
-        }
-        std::string path = file.substr(pos + 1, file.length());
-
-        std::unordered_map<int, std::function<void(const std::vector<std::string> &)>>::const_iterator got = action_map.find(event);
-        if (got == action_map.end())
-        {
-            std::cerr << Color::error_message() << " EVENT not found." << std::endl;
-            std::cerr << event << std::endl;
-            return 1;
-        }
-        event_map[event].push_back(path);
-    }
-    for (const auto &[e, v] : event_map)
-    {
-        // pool_handle.detach_task(
-        //     [e,v]{
-        action_map.at(e)(v);
-        //     }
-        // );
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
     }
     return 0;
 }
@@ -230,18 +238,18 @@ private:
                                         if (length > max_length)
                                         {
                                             std::cerr << Color::error_message() << " Message too long." << std::endl;
-                                            do_write("ERROR");
+                                            do_write("ERROR: Message too long");
                                             throw std::length_error(Color::error_message() + "Received data package too large to handle.");
                                         }
                                         if (!handle_message(message))
                                             do_write("OK");
                                         else
-                                            do_write("ERROR");
+                                            do_write("ERROR: handle message");
                                         do_read();
                                     }
                                     else if (ec != boost::asio::error::eof && ec != boost::asio::error::connection_reset)
                                     {
-                                        do_write("ERROR");
+                                        do_write("ERROR: error in connection");
                                         std::cout << "Shutdown." << std::endl;
                                     }
                                 });
@@ -251,7 +259,7 @@ private:
     {
 
         auto self(shared_from_this());
-        boost::asio::async_write(socket_, boost::asio::buffer(response),
+        boost::asio::async_write(socket_, boost::asio::buffer(response + "\n"),
                                  [this, self, response](std::error_code ec, size_t length)
                                  {
                                      if (!ec)
@@ -346,7 +354,7 @@ int main(int argc, char **argv)
         // starting server
         boost::asio::io_context io_context;
         TCPServer server(io_context, server_port);
-        std::cout << Color::colorize("Running ...", Color::CYAN) << std::endl;
+        std::cout << Color::colorize("Running on port: ", Color::CYAN) << server_port << std::endl;
         io_context.run();
     }
     catch (const toml::syntax_error &err)

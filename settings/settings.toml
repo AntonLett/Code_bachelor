@@ -6,7 +6,7 @@ HOST = "localhost"
 
 [opensearch]
 HOST      = "localhost"
-PORT      = "8086"
+PORT      = "9200"
 INDEX     = "clean_test"
 
 [extractors]
