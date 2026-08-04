@@ -72,3 +72,11 @@ target_link_libraries(server PUBLIC
     Boost::system
 )
 target_compile_options(server PRIVATE -O3)
+
+# =============================================================================
+# Executable: Updater
+# =============================================================================
+add_executable(updater
+    list_compare.cpp
+)
+target_compile_options(updater PRIVATE -O3)
