@@ -47,15 +47,16 @@ def process_large_file(input_path, total_lines, probability=0.5, chunk_size=1024
         raise e
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or sys.argv[1] in ['-h', '--help']:
-        print(f"Usage: python3 {sys.argv[0]} <file> [line count]")
+    if len(sys.argv) != 4:
+        print(f"Usage: python3 {sys.argv[0]} <file> <line count> <change in decimal>")
         sys.exit(0)
-    
+
     file_path = sys.argv[1]
-    amount_lines = int(sys.argv[2]) if len(sys.argv) >= 3 else get_line_count(file_path)
+    amount_lines = int(sys.argv[2])
+    probability = float(sys.argv[3])
     
     if not os.path.exists(file_path):
         print(f"File {file_path} not found!", file=sys.stderr)
         sys.exit(1)
     
-    process_large_file(file_path, amount_lines, probability=0.5)
+    process_large_file(file_path, amount_lines, probability=probability)
