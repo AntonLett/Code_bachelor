@@ -228,7 +228,8 @@ int main(int argc, char **argv)
         // ms_double = t2 - t1;
         // std::cout << "Including writing to file it took: " << ms_double.count() << " ms\n";
     }
-    catch ()
+    catch (...)
     {
+        std::cerr << Color::error_message() << "in Updater\n";
     }
 }

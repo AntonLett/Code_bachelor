@@ -48,7 +48,7 @@ void handle_create(const std::vector<std::string> &paths)
 {
     Registry *reg = Registry::getRegistry();
     std::vector<Extractor *> vExtractorAll = reg->getExtractors("*");
-    std::unordered_map<int, std::string> result_map{};
+    std::unordered_map<std::string, std::string> result_map{};
     std::unordered_map<std::string, std::vector<std::string>> extension_map{};
 
     // sort files by extension
@@ -79,9 +79,9 @@ void handle_create(const std::vector<std::string> &paths)
                     auto results = e->extract(files_with_extension);
                     // std::cout << results[1] << std::endl;
                     std::lock_guard<std::mutex> lock(map_mutex);
-                    for (const auto &[inode, res] : results)
+                    for (const auto &[id, res] : results)
                     {
-                        result_map[inode] += res;
+                        result_map[id] += res;
                     }
                 });
         }
@@ -95,10 +95,11 @@ void handle_create(const std::vector<std::string> &paths)
     }
     boost::asio::io_context io;
     POST_Request pr(OS_HOST, OS_PORT, URL_PATH, io);
-    try{
-        for (const auto &[inode, md] : result_map)
+    try
+    {
+        for (const auto &[id, md] : result_map)
         {
-            std::string m = "{\"create\": {\"_id\": \"" + std::to_string(inode) + "\"}}\n{" + md + "}\n";
+            std::string m = "{\"create\": {\"_id\": \"" + id + "\"}}\n{" + md + "}\n";
             pr.send_post(m);
             std::string answer = pr.receive_answer();
             std::string em = get_opensearch_error_message(answer);
@@ -109,7 +110,8 @@ void handle_create(const std::vector<std::string> &paths)
             }
         }
     }
-    catch (const std::exception &e){
+    catch (const std::exception &e)
+    {
         std::cerr << Color::MAGENTA << "ERROR IN HANDLE_CREATE" << Color::RESET << std::endl;
         std::cerr << e.what() << std::endl;
     }
@@ -122,9 +124,8 @@ void handle_delete(const std::vector<std::string> &paths)
     std::string delete_messages{};
     for (const std::string &fp : paths)
     {
-        unsigned int inode_num;
-        inode_num = get_inode_number(fp);
-        delete_messages = R"({"delete": {"_id":)" + std::to_string(inode_num) + " }}\n";
+        std::string id = getHash(fp);
+        delete_messages = R"({"delete": {"_id":)" + id + " }}\n";
     }
     pr.send_post(delete_messages);
     std::string answer = pr.receive_answer();
@@ -142,6 +143,22 @@ void handle_move(const std::vector<std::string> &paths)
 
 void handle_modify(const std::vector<std::string> &paths)
 {
+    boost::asio::io_context io;
+    POST_Request pr(OS_HOST, OS_PORT, URL_PATH, io);
+    std::string modify_messages{};
+    for (const std::string &fp : paths)
+    {
+        std::string id = getHash(fp);
+        modify_messages = R"({"update": {"_id":)" + id + " }}\n";
+    }
+    pr.send_post(modify_messages);
+    std::string answer = pr.receive_answer();
+    std::cout << answer << std::endl;
+    std::string em = get_opensearch_error_message(answer);
+    if (em != "")
+    {
+        std::cout << Color::warning_message() << em << std::endl;
+    }
 }
 
 void handle_done(const std::vector<std::string> &paths)

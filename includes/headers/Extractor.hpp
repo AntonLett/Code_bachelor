@@ -10,12 +10,22 @@
 #include <ctime>
 #include <chrono>
 #include <tuple>
+#include <functional>
+#include <string>
 #include "xml2json.hpp"
 #include "hal.hpp"
 #include "../exiftool/inc/ExifTool.h"
 #include "check_if_quotes_needed.hpp"
 
 namespace fs = std::filesystem;
+
+// Source - https://cplusplus.com/reference/functional/hash/
+// Retrieved 2026-08-07
+std::string getHash(std::string s)
+{
+    std::hash<std::string> h;
+    return std::to_string(h(s));
+}
 
 /**
  * The Extractor classes implement different interfaces to extract metadata from given files.
@@ -129,7 +139,7 @@ protected:
 
 public:
     virtual std::string extract(const std::string &path) = 0;
-    virtual std::vector<std::tuple<int, std::string>> extract(const std::vector<std::string> &paths) = 0;
+    virtual std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths) = 0;
     virtual void registerExtractor() = 0;
     std::string getName() { return name; }
 };
@@ -180,15 +190,14 @@ public:
         }
     }
 
-    std::vector<std::tuple<int, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
     {
         try
         {
-            std::vector<std::tuple<int, std::string>> result{};
+            std::vector<std::tuple<std::string, std::string>> result{};
             for (const auto &s : paths)
             {
-                int inode_num;
-                inode_num = get_inode_number(s);
+                std::string id = getHash(s);
                 // coversion from Mistral Large 3 675B Instruct 2512 (C++ Inheritance Issues, 06.Mai.2026)
                 std::wstring wpath;
                 std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -213,7 +222,7 @@ public:
                 }
 
                 std::string res = xml2json(xml.c_str());
-                result.push_back(std::tuple(inode_num, res.substr(1, res.size() - 2)));
+                result.push_back(std::tuple(id, res.substr(1, res.size() - 2)));
             }
             return result;
         }
@@ -283,14 +292,13 @@ public:
         return result;
     }
 
-    std::vector<std::tuple<int, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
     {
-        std::vector<std::tuple<int, std::string>> results;
+        std::vector<std::tuple<std::string, std::string>> results;
         ExifTool *et = new ExifTool();
         for (std::string fp : paths)
         {
-            int inode_num;
-            inode_num = get_inode_number(fp);
+            std::string id = getHash(fp);
             std::string metadata = "";
             const char *file_path = fp.c_str();
             int cmdNum = et->ExtractInfo(file_path, "-File:all\n-s\n-a\n-FileGroupID\n");
@@ -309,7 +317,7 @@ public:
                     else
                         metadata += "";
                 }
-                results.push_back(std::tuple(inode_num, metadata));
+                results.push_back(std::tuple(id, metadata));
                 delete info;
             }
             else if (et->LastComplete() <= 0)
@@ -352,14 +360,13 @@ public:
         registerExtractor();
     }
 
-    std::vector<std::tuple<int, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
     {
-        std::vector<std::tuple<int, std::string>> results{};
+        std::vector<std::tuple<std::string, std::string>> results{};
         for (const fs::path &fp : paths)
         {
-            int inode_num;
-            inode_num = get_inode_number(fp);
-            results.push_back(std::tuple(inode_num,
+            std::string id = getHash(fp);
+            results.push_back(std::tuple(id,
                                          "\"FileSize\": " + std::to_string(fs::file_size(fp)) + "," + "\"LastWrite\": \"" + time_to_string(fs::last_write_time(fp)) + "\"," + "\"FileStatus\": \"" + permsToString(fs::status(fp).permissions()) + "\"," + "\"FilePath\": \"" + fp.string() + "\", " + getOwnerInfo(fp)));
         }
         return results;
