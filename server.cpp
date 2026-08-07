@@ -256,7 +256,7 @@ private:
                                     if (!ec)
                                     {
                                         std::string message(data_, length);
-                                        std::cout << Color::info_message("Message: " + message) << std::endl;
+                                        // std::cout << Color::info_message("Message: " + message) << std::endl;
                                         if (length > max_length)
                                         {
                                             std::cerr << Color::error_message() << " Message too long." << std::endl;

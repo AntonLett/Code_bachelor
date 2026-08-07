@@ -70,6 +70,7 @@ void send_files_to_server()
     Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
     const std::string done_message = std::to_string(DONE) + " Done\n";
     std::cout << "Res: " << client->sendMessage(done_message) << std::endl;
+    std::cout << Color::info_message() << "sent all files.\n";
 }
 
 // Source - https://stackoverflow.com/a/6406411
@@ -143,7 +144,7 @@ int main(int argc, char *argv[])
         CrawlerBase<decltype(my_processor)> cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
         cb.start_crawl_pool();
         cb.wait_all();
-
+        std::cout << "Found all files.\n";
         // either write to file or send to server
         send_files_to_server();
         // write_files_for_updater();
