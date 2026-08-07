@@ -95,17 +95,23 @@ void handle_create(const std::vector<std::string> &paths)
     }
     boost::asio::io_context io;
     POST_Request pr(OS_HOST, OS_PORT, URL_PATH, io);
-    for (const auto &[inode, md] : result_map)
-    {
-        std::string m = "{\"create\": {\"_id\": \"" + std::to_string(inode) + "\"}}\n{" + md + "}\n";
-        pr.send_post(m);
-        std::string answer = pr.receive_answer();
-        std::string em = get_opensearch_error_message(answer);
-        if (em != "")
+    try{
+        for (const auto &[inode, md] : result_map)
         {
-            std::cout << Color::warning_message(m) << std::endl;
-            std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl;
+            std::string m = "{\"create\": {\"_id\": \"" + std::to_string(inode) + "\"}}\n{" + md + "}\n";
+            pr.send_post(m);
+            std::string answer = pr.receive_answer();
+            std::string em = get_opensearch_error_message(answer);
+            if (em != "")
+            {
+                std::cout << Color::warning_message(m) << std::endl;
+                std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl;
+            }
         }
+    }
+    catch (const std::exception &e){
+        std::cerr << Color::MAGENTA << "ERROR IN HANDLE_CREATE" << Color::RESET << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }
 void handle_delete(const std::vector<std::string> &paths)
@@ -143,7 +149,7 @@ void handle_done(const std::vector<std::string> &paths)
     std::cout << "Done." << std::endl;
 }
 
-int handle_message(std::string message)
+bool handle_message(std::string message)
 {
     try
     {
@@ -173,8 +179,7 @@ int handle_message(std::string message)
             {
                 std::cerr << Color::error_message() << " Message not in expected format!" << std::endl;
                 std::cerr << "File: " << file << std::endl;
-                ;
-                return 1;
+                return false;
             }
 
             int event = std::stoi(file.substr(0, pos)); // i.e. CREATE, MOVED_TO, ... (based on linux tool inotify)
@@ -182,7 +187,7 @@ int handle_message(std::string message)
             {
                 std::cerr << Color::error_message() << " Invalid position for path extraction" << std::endl;
                 std::cerr << file << std::endl;
-                return 1;
+                return false;
             }
             std::string path = file.substr(pos + 1, file.length());
 
@@ -191,7 +196,7 @@ int handle_message(std::string message)
             {
                 std::cerr << Color::error_message() << " EVENT not found." << std::endl;
                 std::cerr << event << std::endl;
-                return 1;
+                return false;
             }
             event_map[event].push_back(path);
         }
@@ -207,9 +212,9 @@ int handle_message(std::string message)
     catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
 // Source: https://www.codingwiththomas.com/blog/boost-asio-server-client-example
@@ -241,7 +246,7 @@ private:
                                             do_write("ERROR: Message too long");
                                             throw std::length_error(Color::error_message() + "Received data package too large to handle.");
                                         }
-                                        if (!handle_message(message))
+                                        if (handle_message(message))
                                             do_write("OK");
                                         else
                                             do_write("ERROR: handle message");
