@@ -21,11 +21,12 @@ test_updater:
 	--export-json ergebnisse_$(PERCENT)_perc.json \
 	'executables/updater /gpfs/scic/personal/lettowh/laurent_test_og /gpfs/scic/personal/lettowh/laurent_$(PERCENT)_perc'
 
+find . -type f -printf '%T@;%C@;%A@;%s;%p\n' | LC_ALL=C sort >> mnew.txt
+
 test_crawler:
 	hyperfine \
 	--warmup 1 \
 	--runs 5 \
-	--export-json ergebnisse_crawler_lizard10x \
-	'./executables/typefinderV4 -s ./settings/settings.toml -t /gpfs/scic/data/projects/Lizard10x' \
-	--cleanup 'curl -X GET -k http://localhost:9201/clean_test/_count && curl -s -X DELETE -k http://localhost:9201/clean_test > /dev/null' \
-	--show-output
+	--export-json ergebnisse_crawler_local \
+	'./executables/typefinderV4 -s ./settings/settings.toml -t ..' \
+	--cleanup 'curl -X GET -k http://localhost:9200/clean_test/_count && curl -s -X DELETE -k http://localhost:9200/clean_test > /dev/null'

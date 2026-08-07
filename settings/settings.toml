@@ -3,6 +3,7 @@ PORT       = 8085
 EXTRACTOR_THREADS = 8
 IP = "127.0.0.1"
 HOST = "localhost"
+PACKAGE_SIZE = 8192
 
 [opensearch]
 HOST      = "localhost"
