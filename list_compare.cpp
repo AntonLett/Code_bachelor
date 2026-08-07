@@ -1,11 +1,19 @@
+#include <argparse/argparse.hpp>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include "includes/headers/client.hpp"
+#include "includes/headers/protocol.h"
+#include "includes/headers/color_print.hpp"
+#include "includes/headers/toml.hpp"
 // #include <chrono>
 
-std::vector<std::string> created, deleted, altered, same;
+std::string SERVER_PORT{};
+std::string SERVER_IP{};
+std::vector<std::string> created, deleted, altered;
+const size_t MAX_SIZE = 4096;
 
 struct basicFileInfo
 {
@@ -13,33 +21,73 @@ struct basicFileInfo
     std::vector<std::string> mdata;
 };
 
+void send_data(const std::vector<std::string> &paths, int event)
+{
+    // TODO: get timing right, wait for answers before sending more data as to not overwhelm the server
+    std::string response = "";
+    unsigned short try_count = 0;
+    Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
+    std::string message = "";
+    for (const std::string path : paths)
+    {
+        std::string next_path = std::to_string(event) + " " + path + "\n";
+        if ((message + next_path).length() > MAX_SIZE)
+        {
+            response = client->sendMessage(message);
+            if (response != "ERROR sending failed")
+            {
+                std::cout << Color::info_message() << response << std::endl;
+            }
+            message = "";
+        }
+        message += next_path;
+    }
+    if (message != "")
+    {
+        response = client->sendMessage(message);
+    }
+    if (response == "ERROR")
+    {
+        std::cerr << "Error in response. Exiting." << std::endl;
+        exit(1);
+    }
+}
+
 bool check_change(const basicFileInfo &old, const basicFileInfo &cur)
 {
-    if(old.mdata.size() != cur.mdata.size()) return true;
-    for(int i{}; i<cur.mdata.size(); ++i){
-        if(old.mdata.at(i) != cur.mdata.at(i)) return true;
+    if (old.mdata.size() != cur.mdata.size())
+        return true;
+    for (int i{}; i < cur.mdata.size(); ++i)
+    {
+        if (old.mdata.at(i) != cur.mdata.at(i))
+            return true;
     }
     return false;
 }
 
-bool readLine(std::ifstream &file, basicFileInfo &fi, char delimValue = ';', char delimEntry = '\n'){
+bool readLine(std::ifstream &file, basicFileInfo &fi, char delimValue = ';', char delimEntry = '\n')
+{
     std::string line;
     bool status = static_cast<bool>(getline(file, line, delimEntry));
     // when no new line available, stop
     if (!status)
         return status;
     size_t pathPos = line.rfind(" -- ");
-    if(pathPos != std::string::npos && (pathPos + 4) < line.length()){
+    if (pathPos != std::string::npos && (pathPos + 4) < line.length())
+    {
         fi.name = line.substr(pathPos + 4);
         std::string metadata = line.substr(0, pathPos);
         std::stringstream ss(metadata);
         std::string token;
         std::vector<std::string> tokens;
 
-        while(std::getline(ss, token, delimValue)){
+        while (std::getline(ss, token, delimValue))
+        {
             tokens.push_back(token);
         }
-    } else {
+    }
+    else
+    {
         std::cerr << "Filename not found.\n";
         fi.name = line;
     }
@@ -64,8 +112,7 @@ void readFile(const std::string &oldFileName, const std::string &newFileName)
             if (check_change(old, current))
             {
                 altered.push_back(old.name);
-            } else same.push_back(old.name);
-            // std::cout << "same" << std::endl;
+            }
             oldNext = readLine(oldFile, old);
             newNext = readLine(newFile, current);
             continue;
@@ -116,11 +163,14 @@ void readFile(const std::string &oldFileName, const std::string &newFileName)
     }
 }
 
-void printToFile(const std::string& fileName, const std::vector<std::string>& data, int eventNumber){
+void printToFile(const std::string &fileName, const std::vector<std::string> &data, int eventNumber)
+{
     std::ofstream file(fileName);
 
-    if(file.is_open()){
-        for(const auto& d : data){
+    if (file.is_open())
+    {
+        for (const auto &d : data)
+        {
             file << eventNumber << " " << d << "\n";
         }
     }
@@ -132,17 +182,53 @@ int main(int argc, char **argv)
     // double time_taken;
     // auto t1 = std::chrono::high_resolution_clock::now();
 
-    readFile(argv[1], argv[2]);
+    argparse::ArgumentParser program("Crawler");
+    program.add_argument("-o", "--old")
+        .help("File containing the old status of the folder");
+    program.add_argument("-c", "--current")
+        .help("File containing the current status of the folder");
+    program.add_argument("-s", "--settings")
+        .help("Path to settings")
+        .default_value("../settings/settings.toml");
 
-    // auto t2 = std::chrono::high_resolution_clock::now();
-    // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
-    // std::cout << "Comparing took: " << ms_double.count() << " ms\n";
+    try
+    {
+        program.parse_args(argc, argv);
+        std::filesystem::path path_to_settings = program.get("-s");
+        std::filesystem::path old = program.get("-o");
+        std::filesystem::path cur = program.get("-c");
+        if (!std::filesystem::exists(path_to_settings) || !std::filesystem::exists(old) || !std::filesystem::exists(cur))
+        {
+            std::cerr << "Invalid path.\n";
+            std::cerr << "Usage: " << argv[0] << "-s <path/to/settings.toml> -o <path/tp/old> -c <path/to/current>\n";
+            return 1;
+        }
 
-    printToFile("updater_files/created", created, 1);
-    printToFile("updater_files/deleted", deleted, 2);
-    printToFile("updater_files/altered", altered, 4);
-    printToFile("updater_files/same", same, 0);
-    // t2 = std::chrono::high_resolution_clock::now();
-    // ms_double = t2 - t1;
-    // std::cout << "Including writing to file it took: " << ms_double.count() << " ms\n";
+        // settings for server
+        const auto settings = toml::parse(path_to_settings);
+        const auto SERVER_SETTINGS = toml::find(settings, "server");
+        int server_port = toml::find<int>(SERVER_SETTINGS, "PORT");
+        SERVER_PORT = std::to_string(server_port);
+        SERVER_IP = toml::find<std::string>(SERVER_SETTINGS, "IP");
+
+        readFile(old, cur);
+
+        // auto t2 = std::chrono::high_resolution_clock::now();
+        // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
+        // std::cout << "Comparing took: " << ms_double.count() << " ms\n";
+
+        send_data(created, CREATE);
+        send_data(deleted, DELETE);
+        send_data(altered, MODIFY);
+
+        // printToFile("updater_files/created", created, 1);
+        // printToFile("updater_files/deleted", deleted, 2);
+        // printToFile("updater_files/altered", altered, 4);
+        // t2 = std::chrono::high_resolution_clock::now();
+        // ms_double = t2 - t1;
+        // std::cout << "Including writing to file it took: " << ms_double.count() << " ms\n";
+    }
+    catch ()
+    {
+    }
 }

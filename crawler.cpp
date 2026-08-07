@@ -59,23 +59,30 @@ void print_map(std::ostream &os)
     }
 }
 
-void write_to_file()
+void send_files_to_server()
 {
-    if (!extension_count.empty())
+    if (!path_vector.empty())
     {
-        std::ofstream outFile("results/output_file.txt");
+        std::cout << "Vector not empty yet, sending data." << std::endl;
+        send_data(path_vector);
+        path_vector.clear();
+    }
+    Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
+    const std::string done_message = std::to_string(DONE) + " Done\n";
+    std::cout << "Res: " << client->sendMessage(done_message) << std::endl;
+}
 
-        // TODO: Fehler loggen, statt nur cerr?
-        if (!outFile.is_open())
-        {
-            std::cerr << "ERROR: Datei konnte nicht erstellt werden!\n";
-            print_map(std::cout);
-        }
-        else
-        {
-            print_map(outFile);
-        }
-        outFile.close();
+// Source - https://stackoverflow.com/a/6406411
+// Posted by johnsyweb, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-08-07, License - CC BY-SA 4.0
+void write_files_for_updater()
+{
+    if (!path_vector.empty())
+    {
+        std::ofstream output_file("./updater_files_new");
+
+        std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+        std::copy(std::begin(path_vector), std::end(path_vector), output_iterator);
     }
 }
 
@@ -132,24 +139,15 @@ int main(int argc, char *argv[])
         double time_taken;
         auto t1 = std::chrono::high_resolution_clock::now();
 
+        // Crawl directory, then wait for all processes to finish
         CrawlerBase<decltype(my_processor)> cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
         cb.start_crawl_pool();
         cb.wait_all();
-        std::cout << Color::warning_message(std::to_string(path_vector.size())) << std::endl;
-        // for (const auto &s : path_vector)
-        // {
-        //     std::cout << Color::warning_message(s) << std::endl;
-        // }
-        // write_to_file();
-        if (!path_vector.empty())
-        {
-            std::cout << "Vector not empty yet, sending data." << std::endl;
-            send_data(path_vector);
-            path_vector.clear();
-        }
-        Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
-        const std::string done_message = std::to_string(DONE) + " Done\n";
-        std::cout << "Res: " << client->sendMessage(done_message) << std::endl;
+
+        // either write to file or send to server
+        send_files_to_server();
+        // write_files_for_updater();
+
         std::cout << "Amount of files: " << file_count << std::endl;
         auto t2 = std::chrono::high_resolution_clock::now();
         std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
