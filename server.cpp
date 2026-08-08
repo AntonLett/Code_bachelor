@@ -97,17 +97,19 @@ void handle_create(const std::vector<std::string> &paths)
     POST_Request pr(OS_HOST, OS_PORT, URL_PATH, io);
     try
     {
+        std::string all_files = {};
         for (const auto &[id, md] : result_map)
         {
-            std::string m = "{\"create\": {\"_id\": \"" + id + "\"}}\n{" + md + "}\n";
-            pr.send_post(m);
-            std::string answer = pr.receive_answer();
-            std::string em = get_opensearch_error_message(answer);
-            if (em != "")
-            {
-                std::cout << Color::warning_message(m) << std::endl;
-                std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl;
-            }
+            all_files += "{\"create\": {\"_id\": \"" + id + "\"}}\n{" + md + "}\n";
+        }
+        pr.send_post(all_files);
+        std::string answer = pr.receive_answer();
+        std::string em = get_opensearch_error_message(answer);
+        if (em != "")
+        {
+            std::cout << Color::warning_message(all_files);
+            std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl
+                      << std::endl;
         }
     }
     catch (const std::exception &e)
@@ -118,7 +120,7 @@ void handle_create(const std::vector<std::string> &paths)
 }
 void handle_delete(const std::vector<std::string> &paths)
 {
-    std::cout << Color::info_message("Deleting.\n");
+    // std::cout << Color::info_message("Deleting.\n");
     boost::asio::io_context io;
     POST_Request pr(OS_HOST, OS_PORT, URL_PATH, io);
     std::string delete_messages{};
@@ -284,15 +286,15 @@ private:
         boost::asio::async_write(socket_, boost::asio::buffer(response + "\n"),
                                  [this, self, response](std::error_code ec, size_t length)
                                  {
-                                     if (!ec)
-                                     {
-                                         std::cout << Color::colorize("INFO:", Color::BOLD, Color::CYAN) << " Response sent: " << response << std::endl;
-                                     }
-                                     else
+                                     if (ec)
                                      {
                                          std::cerr << Color::error_message() << " Error while sending response. " << std::endl;
                                          std::cerr << ec.message() << std::endl;
                                      }
+                                     //  else
+                                     //  {
+                                     //     //  std::cout << Color::colorize("INFO:", Color::BOLD, Color::CYAN) << " Response sent: " << response << std::endl;
+                                     //  }
                                  });
     }
 
@@ -369,8 +371,10 @@ int main(int argc, char **argv)
         std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
         std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
         std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
+        std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
         Exiftool_Extractor exiftool_extractor(exiftool_types);
         CZI_Extractor czi(czi_types);
+        Exiv2_Extractor exiv2_extractor(exiv2_types);
         FilesystemInfo_Extractor fie(fie_types);
 
         // starting server

@@ -7,12 +7,13 @@ PACKAGE_SIZE = 8192
 
 [opensearch]
 HOST      = "localhost"
-PORT      = "9201"
+PORT      = "9200"
 INDEX     = "clean_test"
 
 [extractors]
 Exif = [".360",".3FR",".3G2",".3GP",".7Z",".A",".AA",".AAC",".AAE",".AAX",".ACR",".AFM",".AI",".AIFF",".APE",".ARQ",".ARW",".ASF",".AVI",".AVIF",".AZW",".BMP",".BPG",".BTF",".C2PA",".CHM",".COS",".CR2",".CR3",".CRM",".CRW",".CS1",".CSV",".CUR",".CZI",".DCM",".DCP",".DCR",".DFONT",".DIVX",".DJVU",".DLL",".DNG",".DOC",".DOCX",".DPX",".DR4",".DSF",".DSS",".DV",".DVB",".DVR-MS",".DYLIB",".EIP",".EPS",".EPUB",".ERF",".EXE",".EXIF",".EXR",".EXV",".F4A/V",".FFF",".FIT",".FITS",".FLA",".FLAC",".FLIF",".FLV",".FPF",".FPX",".GIF",".GLV",".GPR",".GZ",".HDP",".HDR",".HEIC",".HEIF",".HTML",".ICC",".ICO",".ICS",".IDML",".IIQ",".IND",".INSP",".INSV",".INX",".ISO",".ITC",".J2C",".JNG",".JP2",".JPEG",".JSON",".JXL",".K25",".KDC",".KEY",".KVAR",".LA",".LFP",".LIF",".LNK",".LRV",".M2TS",".M4A/V",".MACOS",".MAX",".MEF",".MIE",".MIFF",".MKA",".MKS",".MKV",".MNG",".MOBI",".MODD",".MOI",".MOS",".MOV",".MP3",".MP4",".MPC",".MPG",".MPO",".MQV",".MRC",".MRW",".MXF",".NEF",".NKA",".NKSC",".NRW",".NUMBERS",".NXD",".O",".ODP",".ODS",".ODT",".OFR",".OGG",".OGV",".ONP",".OPUS",".ORF",".ORI",".OTF",".PAC",".PAGES",".PBM",".PCAP",".PCAPNG",".PCD",".PCX",".PDB",".PDF",".PEF",".PFA",".PFB",".PFM",".PGF",".PGM",".PICT",".PLIST",".PMP",".PNG",".PPM",".PPT",".PPTX",".PS",".PSB",".PSD",".PSP",".QTIF",".R3D",".RA",".RAF",".RAM",".RAR",".RAW",".RIFF",".RSRC",".RTF",".RW2",".RWL",".RWZ",".RM",".SEQ",".SKETCH",".SO",".SR2",".SRF",".SRW",".SVG",".SWF",".THM",".TIFF",".TNEF",".TORRENT",".TTC",".TTF",".TXT",".URL",".VCF",".VNT",".VRD",".VSD",".VSDX",".WAV",".WDP",".WEBP",".WEBM",".WMA",".WMV",".WOFF",".WOFF2",".WTV",".WV",".X3F",".XCF",".XISF",".XLS",".XLSX",".XMP",".ZIP"]
 CZI  = [".czi"]
+EXIV2 = [".ARW",".AVIF",".CR2",".CR3",".CRW",".DCP",".DNG",".EPS",".EXV",".HEIC",".HEIF",".JP2",".JPEG",".JXL",".MRW",".NEF",".ORF",".PEF",".PGF",".PNG",".PSD",".RAF",".RW2",".SR2",".SRW",".TIFF",".WEBP",".XMP"]
 Fileinfo = ["*"]
 
 [crawler]

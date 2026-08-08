@@ -39,6 +39,24 @@ set(BOOST_INCLUDE_LIBRARIES algorithm asio beast)
 FetchContent_MakeAvailable(Boost)
 
 # =============================================================================
+# Exiv2 einbinden
+# =============================================================================
+FetchContent_Declare(
+    exiv2
+    GIT_REPOSITORY https://github.com/Exiv2/exiv2.git
+    GIT_TAG        v0.27.7
+    GIT_SHALLOW    TRUE
+)
+set(EXIV2_ENABLE_WEBP OFF CACHE BOOL "" FORCE)
+set(EXIV2_ENABLE_XMP  ON  CACHE BOOL "" FORCE)
+set(EXIV2_ENABLE_PNG  ON  CACHE BOOL "" FORCE)
+set(EXIV2_ENABLE_JPEG ON  CACHE BOOL "" FORCE)
+set(EXIV2_ENABLE_TIFF ON  CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(exiv2)
+
+
+
+# =============================================================================
 # Executable: typefinderV4
 # =============================================================================
 add_executable(typefinderV4
@@ -70,6 +88,7 @@ target_link_libraries(server PUBLIC
     Boost::asio
     Boost::beast
     Boost::system
+    Exiv2
 )
 target_compile_options(server PRIVATE -O3)
 

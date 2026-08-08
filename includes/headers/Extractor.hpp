@@ -12,6 +12,7 @@
 #include <tuple>
 #include <functional>
 #include <string>
+#include <exiv2/exiv2.hpp>
 #include "xml2json.hpp"
 #include "hal.hpp"
 #include "../exiftool/inc/ExifTool.h"
@@ -342,6 +343,83 @@ public:
     {
         this->name = "Exiftool";
         registerExtractor();
+    }
+};
+
+class Exiv2_Extractor : public Extractor
+{
+public:
+    void registerExtractor()
+    {
+        Registry *reg = Registry::getRegistry();
+        reg->Registry::addToRegistry(supported_types, this);
+    }
+
+    FilesystemInfo_Extractor(std::vector<std::string> vs) : Extractor(vs)
+    {
+        this->name = "FileInfo";
+        registerExtractor();
+    }
+
+    template <typename T>
+    void read_metadata(const T &data, std::string &md)
+    {
+        auto end = data.end();
+        for (auto i = data.begin(); i != end; ++i)
+        {
+            md += "\"" + i->key() + "\": ";
+            if (i->typeName() == "SHORT" || i->typeName() == "LONG")
+            {
+                md += i->value();
+            }
+            else
+            {
+                md += "\"" + i->value() + "\"";
+            }
+            if (std::next(i) != end)
+            {
+                md += ",";
+            }
+        }
+    }
+
+    std::vector<std::tuple<std::string, std::string>>
+    extract(const std::vector<std::string> &paths)
+    {
+        std::vector<std::tuple<std::string, std::string>> results;
+        for (const auto &fp : paths)
+        {
+            // Source - https://exiv2.org/examples.html
+            // Accessed: 08.08.2026
+            std::string id = getHash(fp);
+            Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(fp);
+            image->readMetadata();
+            if (!image)
+            {
+                std::cerr << "Cannot open file: " << fp << std::endl;
+                continue;
+            }
+
+            Exiv2::ExifData &exifData = image->exifData();
+            Exiv2::IptcData &iptcData = image->iptcData();
+            Exiv2::XmpData &xmpData = image->xmpData();
+            std::string md = "";
+            if (!exifData.empty())
+            {
+                read_metadata(exifData, md);
+                md += ",";
+            }
+            if (!iptcData.empty())
+            {
+                read_metadata(iptcData, md);
+                md += ",";
+            }
+            if (!xmpData.empty())
+                read_metadata(xmpData, md);
+            md += "\n";
+            results.push_back(std::tuple(id, md));
+        }
+        return results;
     }
 };
 
