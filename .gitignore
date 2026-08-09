@@ -1,6 +1,6 @@
 .vscode
 executables/
-results/
+/results/
 examples/
 build/
 updater_files/

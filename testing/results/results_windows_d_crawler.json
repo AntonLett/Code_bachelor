@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "command": ".\\executables\\Release\\typefinderV4.exe -s ./settings/settings.toml -t D:\"",
+      "mean": 492.78993168,
+      "stddev": 353.90287058621766,
+      "median": 338.17675928,
+      "user": 2.260625,
+      "system": 4.349375,
+      "min": 318.43894528,
+      "max": 1125.52411008,
+      "times": [
+        350.77444008,
+        318.43894528,
+        1125.52411008,
+        338.17675928,
+        331.03540368
+      ],
+      "memory_usage_byte": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}
