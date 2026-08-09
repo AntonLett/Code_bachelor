@@ -23,8 +23,8 @@ def process_large_file(input_path, total_lines, probability=0.5, chunk_size=1024
     temp_fd, temp_path = tempfile.mkstemp(dir=dir_name, suffix='.tmp')
     
     try:
-        with open(input_path, 'r', encoding='utf-8', buffering=chunk_size) as f_in, \
-             os.fdopen(temp_fd, 'w', encoding='utf-8', buffering=chunk_size) as f_out:
+        with open(input_path, 'r', encoding='cp1252', buffering=chunk_size) as f_in, \
+             os.fdopen(temp_fd, 'w', encoding='cp1252', buffering=chunk_size) as f_out:
             
             modified_count = 0
             for line_num, line in enumerate(f_in):

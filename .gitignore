@@ -4,3 +4,5 @@ results/
 examples/
 build/
 updater_files/
+testing/lists/
+vcpkg_installed/

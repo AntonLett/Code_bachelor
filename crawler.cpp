@@ -32,10 +32,10 @@ void send_data(const std::vector<std::string> &paths)
         if ((message + next_path).length() > MAX_SIZE)
         {
             response = client->sendMessage(message);
-            if (response != "ERROR sending failed")
+            /*if (response != "ERROR sending failed")
             {
                 std::cout << Color::info_message() << response << std::endl;
-            }
+            }*/
             message = "";
         }
         message += next_path;

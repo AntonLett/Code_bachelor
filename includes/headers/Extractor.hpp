@@ -12,10 +12,11 @@
 #include <tuple>
 #include <functional>
 #include <string>
+#include <codecvt>
 #include <exiv2/exiv2.hpp>
 #include "xml2json.hpp"
 #include "hal.hpp"
-#include "../exiftool/inc/ExifTool.h"
+// #include "../exiftool/inc/ExifTool.h"
 #include "check_if_quotes_needed.hpp"
 
 namespace fs = std::filesystem;
@@ -191,7 +192,7 @@ public:
         }
     }
 
-    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths) override
     {
         try
         {
@@ -244,6 +245,7 @@ public:
 /**
  * Exiftool Extractor inheriting from Extractor implements a call to exiftool to extract metadata from given files.
  */
+/*
 class Exiftool_Extractor : public Extractor
 {
 public:
@@ -293,7 +295,7 @@ public:
         return result;
     }
 
-    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths) override
     {
         std::vector<std::tuple<std::string, std::string>> results;
         ExifTool *et = new ExifTool();
@@ -344,7 +346,7 @@ public:
         this->name = "Exiftool";
         registerExtractor();
     }
-};
+};*/
 
 class Exiv2_Extractor : public Extractor
 {
@@ -355,9 +357,9 @@ public:
         reg->Registry::addToRegistry(supported_types, this);
     }
 
-    FilesystemInfo_Extractor(std::vector<std::string> vs) : Extractor(vs)
+    Exiv2_Extractor(std::vector<std::string> vs) : Extractor(vs) 
     {
-        this->name = "FileInfo";
+        this->name = "Exiv2";
         registerExtractor();
     }
 
@@ -370,11 +372,11 @@ public:
             md += "\"" + i->key() + "\": ";
             if (i->typeName() == "SHORT" || i->typeName() == "LONG")
             {
-                md += i->value();
+                md += i->value().toString();
             }
             else
             {
-                md += "\"" + i->value() + "\"";
+                md += "\"" + i->value().toString() + "\"";
             }
             if (std::next(i) != end)
             {
@@ -384,7 +386,7 @@ public:
     }
 
     std::vector<std::tuple<std::string, std::string>>
-    extract(const std::vector<std::string> &paths)
+    extract(const std::vector<std::string> &paths) override
     {
         std::vector<std::tuple<std::string, std::string>> results;
         for (const auto &fp : paths)
@@ -392,13 +394,13 @@ public:
             // Source - https://exiv2.org/examples.html
             // Accessed: 08.08.2026
             std::string id = getHash(fp);
-            Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(fp);
-            image->readMetadata();
+            Exiv2::Image::UniquePtr image = Exiv2::ImageFactory::open(fp);
             if (!image)
             {
                 std::cerr << "Cannot open file: " << fp << std::endl;
                 continue;
             }
+            image->readMetadata();
 
             Exiv2::ExifData &exifData = image->exifData();
             Exiv2::IptcData &iptcData = image->iptcData();
@@ -421,6 +423,39 @@ public:
         }
         return results;
     }
+
+    std::string extract(const std::string &path) override
+    {
+        // Source - https://exiv2.org/examples.html
+        // Accessed: 08.08.2026
+        std::string id = getHash(path);
+        Exiv2::Image::UniquePtr image = Exiv2::ImageFactory::open(path);
+        if (!image)
+        {
+            std::cerr << "Cannot open file: " << path << std::endl;
+            return "";
+        }
+        image->readMetadata();
+
+        Exiv2::ExifData &exifData = image->exifData();
+        Exiv2::IptcData &iptcData = image->iptcData();
+        Exiv2::XmpData &xmpData = image->xmpData();
+        std::string md = "";
+        if (!exifData.empty())
+        {
+            read_metadata(exifData, md);
+            md += ",";
+        }
+        if (!iptcData.empty())
+        {
+            read_metadata(iptcData, md);
+            md += ",";
+        }
+        if (!xmpData.empty())
+            read_metadata(xmpData, md);
+        md += "\n";
+        return md;
+    }
 };
 
 class FilesystemInfo_Extractor : public Extractor
@@ -438,19 +473,20 @@ public:
         registerExtractor();
     }
 
-    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths)
+    std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths) override
     {
         std::vector<std::tuple<std::string, std::string>> results{};
         for (const fs::path &fp : paths)
         {
-            std::string id = getHash(fp);
+            std::string fp_string = fp.string();
+            std::string id = getHash(fp_string);
             results.push_back(std::tuple(id,
-                                         "\"FileSize\": " + std::to_string(fs::file_size(fp)) + "," + "\"LastWrite\": \"" + time_to_string(fs::last_write_time(fp)) + "\"," + "\"FileStatus\": \"" + permsToString(fs::status(fp).permissions()) + "\"," + "\"FilePath\": \"" + fp.string() + "\", " + getOwnerInfo(fp)));
+                                         "\"FileSize\": " + std::to_string(fs::file_size(fp)) + "," + "\"LastWrite\": \"" + time_to_string(fs::last_write_time(fp)) + "\"," + "\"FileStatus\": \"" + permsToString(fs::status(fp).permissions()) + "\"," + "\"FilePath\": \"" + fp.generic_string() + "\", " + getOwnerInfo(fp_string)));
         }
         return results;
     }
 
-    std::string extract(const std::string &path)
+    std::string extract(const std::string &path) override
     {
         std::string results{};
         return "\"FileSize\": " + std::to_string(fs::file_size(path)) + "," + "\"LastWrite\": \"" + time_to_string(fs::last_write_time(path)) + "\"," + "\"FileStatus\": \"" + permsToString(fs::status(path).permissions()) + "\"," + "\"FilePath\": \"" + path + "\"," + getOwnerInfo(path) + "";

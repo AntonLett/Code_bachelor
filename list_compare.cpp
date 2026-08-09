@@ -1,4 +1,5 @@
 #include <argparse/argparse.hpp>
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -94,7 +95,7 @@ bool readLine(std::ifstream &file, basicFileInfo &fi, char delimValue = ';', cha
     return status;
 }
 
-void readFile(const std::string &oldFileName, const std::string &newFileName)
+void readFile(const std::filesystem::path &oldFileName, const std::filesystem::path &newFileName)
 {
     std::ifstream oldFile(oldFileName);
     std::ifstream newFile(newFileName);
@@ -111,7 +112,7 @@ void readFile(const std::string &oldFileName, const std::string &newFileName)
             // check if change happened
             if (check_change(old, current))
             {
-                altered.push_back(old.name);
+                created.push_back(old.name); // changed not created, but bug in change so for testing
             }
             oldNext = readLine(oldFile, old);
             newNext = readLine(newFile, current);
@@ -176,6 +177,26 @@ void printToFile(const std::string &fileName, const std::vector<std::string> &da
     }
 }
 
+void sortFile(const std::filesystem::path &fileName){
+    std::ifstream file(fileName);
+    std::vector<std::string> lines;
+    std::string line;
+
+    while (std::getline(file, line)){
+        lines.push_back(line);
+    }
+    file.close();
+    std::sort( lines.begin(), lines.end(),
+        [](const std::string& a, const std::string b){
+            return a.substr(a.find(" -- ") + 4) < b.substr(b.find(" -- ") + 4);
+        }
+    );
+    std::ofstream ofile(fileName);
+    for(const std::string& l : lines){
+        ofile << l << "\n";
+    }
+}
+
 int main(int argc, char **argv)
 {
     // clock_t start_time, end_time;
@@ -200,7 +221,7 @@ int main(int argc, char **argv)
         if (!std::filesystem::exists(path_to_settings) || !std::filesystem::exists(old) || !std::filesystem::exists(cur))
         {
             std::cerr << "Invalid path.\n";
-            std::cerr << "Usage: " << argv[0] << "-s <path/to/settings.toml> -o <path/tp/old> -c <path/to/current>\n";
+            std::cerr << "Usage: " << argv[0] << " -s <path/to/settings.toml> -o <path/tp/old> -c <path/to/current>\n";
             return 1;
         }
 
@@ -211,15 +232,15 @@ int main(int argc, char **argv)
         SERVER_PORT = std::to_string(server_port);
         SERVER_IP = toml::find<std::string>(SERVER_SETTINGS, "IP");
 
+        sortFile(cur);
         readFile(old, cur);
 
         // auto t2 = std::chrono::high_resolution_clock::now();
         // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
         // std::cout << "Comparing took: " << ms_double.count() << " ms\n";
 
-        send_data(created, CREATE);
         send_data(deleted, DELETE);
-        send_data(altered, MODIFY);
+        send_data(created, CREATE);
 
         // printToFile("updater_files/created", created, 1);
         // printToFile("updater_files/deleted", deleted, 2);

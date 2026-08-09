@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <unordered_map>
 #include <vector>
-#include "includes/exiftool/inc/ExifTool.h"
+// #include "includes/exiftool/inc/ExifTool.h"
 #include "includes/headers/POST_Request.hpp"
 #include "includes/headers/check_if_quotes_needed.hpp"
 #include "includes/headers/settings_reader.hpp"
@@ -54,14 +54,15 @@ void handle_create(const std::vector<std::string> &paths)
     // sort files by extension
     for (const std::filesystem::path &fp : paths)
     {
-        std::string ext = fp.extension();
+        std::string ext = fp.extension().string();
+        std::string fp_string = fp.string();
         if (ext.empty())
         {
-            extension_map["empty"].push_back(fp);
+            extension_map["empty"].push_back(fp_string);
         }
         else
         {
-            extension_map[ext].push_back(fp);
+            extension_map[ext].push_back(fp_string);
         }
     }
 
@@ -105,7 +106,7 @@ void handle_create(const std::vector<std::string> &paths)
         pr.send_post(all_files);
         std::string answer = pr.receive_answer();
         std::string em = get_opensearch_error_message(answer);
-        if (em != "")
+        if (!em.empty())
         {
             std::cout << Color::warning_message(all_files);
             std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl
@@ -131,7 +132,6 @@ void handle_delete(const std::vector<std::string> &paths)
     }
     pr.send_post(delete_messages);
     std::string answer = pr.receive_answer();
-    std::cout << answer << std::endl;
     std::string em = get_opensearch_error_message(answer);
     if (em != "")
     {
@@ -368,11 +368,11 @@ int main(int argc, char **argv)
 
         // settings for extractors
         const auto EXTRACTOR_SETTINGS = toml::find(settings, "extractors");
-        std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
+        // std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
         std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
         std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
         std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
-        Exiftool_Extractor exiftool_extractor(exiftool_types);
+        // Exiftool_Extractor exiftool_extractor(exiftool_types);
         CZI_Extractor czi(czi_types);
         Exiv2_Extractor exiv2_extractor(exiv2_types);
         FilesystemInfo_Extractor fie(fie_types);

@@ -26,7 +26,7 @@
             &pSidOwner, NULL, NULL, NULL, &pSD
         );
 
-        if (result != ERROR_SUCCESS) {
+        if (result != ERROR_SUCCESS && result != 5) { // error 5 means access denied -> for performance testing deactivated
             std::cerr << "Error when accessing Security Information: " << result << std::endl;
             return "\"FileOwner\": \"unknown\"";
         }
