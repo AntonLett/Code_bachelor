@@ -1,6 +1,8 @@
 compare same to same (give sizes)
 compare same to same with differing degrees of change (10,20,50,90, 100%) -> python script edit random lines
 compare different sizes
+Updater messen (liste sortieren + vergleichen) vs senden
+Server einzelne Extraktor messen
 
 
 lettowh@D-01297:/gpfs/scic/data/projects$ du -sh Lizard10x/
