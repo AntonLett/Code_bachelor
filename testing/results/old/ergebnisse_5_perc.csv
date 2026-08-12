@@ -1,0 +1,2 @@
+command,mean,stddev,median,user,system,min,max
+executables/updater /gpfs/scic/personal/lettowh/laurent_test_og /gpfs/scic/personal/lettowh/laurent_5_perc,182.41026439837,28.05587671449851,174.18644664712002,159.97459216,18.521801740000008,171.40602217212,299.53983933012

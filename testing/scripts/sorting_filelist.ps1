@@ -1,10 +1,18 @@
-Get-Content ..\dateiListe_d_og.txt |
-ForEach-Object {
+$lines = Get-Content .\testing\lists\new_og_d.txt
+
+$items = foreach ($line in $lines) {
     [PSCustomObject]@{
-        Line = $_
-        Path = ($_ -split ' -- ')[1]
+        Line = $line
+        Path = ($line -split ' -- ', 2)[1]
     }
-} |
-Sort-Object -Property Path |
-Select-Object -ExpandProperty Line |
-Set-Content ..\dateiListe_d_og_sorted.txt
+}
+
+[Array]::Sort(
+    $items,
+    [System.Collections.Generic.Comparer[object]]::Create({
+        param($a, $b)
+        [StringComparer]::Ordinal.Compare($a.Path, $b.Path)
+    })
+)
+
+$items.Line | Set-Content .\testing\lists\new_og_d_sorted.txt

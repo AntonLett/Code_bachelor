@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "command": ".\\executables\\Release\\typefinderV4.exe -s ./settings/settings.toml -t D:\\ && .\\executables\\Release\\updater -s .\\settings\\settings.toml -o .\\testing\\dateiListe_d_og_sorted.txt -c .\\testing\\dateiListe_d_100_perc.txt",
+      "mean": 159.957690432,
+      "stddev": 1.4398025640643892,
+      "median": 159.74902775200002,
+      "user": 6.5809375,
+      "system": 3.3912500000000003,
+      "min": 158.690504752,
+      "max": 162.398123252,
+      "times": [
+        162.398123252,
+        159.74902775200002,
+        158.690504752,
+        159.808491352,
+        159.142305052
+      ],
+      "memory_usage_byte": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

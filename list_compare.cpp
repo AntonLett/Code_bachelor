@@ -35,9 +35,9 @@ void send_data(const std::vector<std::string> &paths, int event)
         if ((message + next_path).length() > MAX_SIZE)
         {
             response = client->sendMessage(message);
-            if (response != "ERROR sending failed")
+            if (response == "ERROR sending failed")
             {
-                std::cout << Color::info_message() << response << std::endl;
+                std::cout << Color::warning_message() << response << std::endl;
             }
             message = "";
         }
@@ -187,7 +187,7 @@ void sortFile(const std::filesystem::path &fileName){
     }
     file.close();
     std::sort( lines.begin(), lines.end(),
-        [](const std::string& a, const std::string b){
+        [](const std::string& a, const std::string& b){
             return a.substr(a.find(" -- ") + 4) < b.substr(b.find(" -- ") + 4);
         }
     );
@@ -239,8 +239,19 @@ int main(int argc, char **argv)
         // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
         // std::cout << "Comparing took: " << ms_double.count() << " ms\n";
 
-        send_data(deleted, DELETE);
+        for (auto &a : created){
+            if(!a.empty()){
+                std::cout << a.length();
+                a.pop_back();
+                std::cout << a.length();
+            }
+        }
         send_data(created, CREATE);
+        // send_data(deleted, DELETE);
+        
+        const std::string done_message = std::to_string(DONE) + " Done\n";
+        Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
+        client->sendMessage(done_message);
 
         // printToFile("updater_files/created", created, 1);
         // printToFile("updater_files/deleted", deleted, 2);
@@ -248,6 +259,9 @@ int main(int argc, char **argv)
         // t2 = std::chrono::high_resolution_clock::now();
         // ms_double = t2 - t1;
         // std::cout << "Including writing to file it took: " << ms_double.count() << " ms\n";
+    }
+    catch(std::exception& e){
+        std::cerr << Color::error_message() << e.what() << std::endl;
     }
     catch (...)
     {

@@ -5,7 +5,6 @@ COMMAND ?= find . -type f -printf '%T@;%C@;%A@;%s;%p\n' | LC_ALL=C sort >> mnew.
 RESULTS_FOLDER = tests\results\
 RESULTS_FILE = result_windows.json
 
-
 typefinderV4:
 	g++ -o executables/typefinderV4 crawler.cpp -pthread -O3
 
@@ -43,3 +42,10 @@ test_windows_updater:
 
 	hyperfine --warmup 1 --runs 5 --export-json .\testing\results\results_windows_d_crawler2.json --prepare "curl.exe -X PUT -k http://localhost:9200/clean_test" ".\executables\Release\typefinderV4.exe -s ./settings/settings.toml -t D:\" --cleanup "curl.exe -s -X DELETE -k http://localhost:9200/clean_test"
 	hyperfine --warmup 1 --runs 5 --export-json .\testing\results\results_windows_d_updater_100_perc.json --prepare "curl.exe -X PUT -k http://localhost:9200/clean_test" ".\executables\Release\typefinderV4.exe -s ./settings/settings.toml -t D:\ && .\executables\Release\updater -s .\settings\settings.toml -o .\testing\dateiListe_d_og_sorted.txt -c .\testing\dateiListe_d_100_perc.txt" --cleanup "curl.exe -s -X DELETE -k http://localhost:9200/clean_test"
+
+hyperfine --warmup 1 --runs 15 --export-json .\testing\results\results_windows_d_updater_50_perc_new.json --prepare "curl.exe -X PUT -k http://localhost:9200/clean_test" ".\executables\Release\typefinderV4.exe -s ./settings/settings.toml -t D:\ && .\executables\Release\updater -s .\settings\settings.toml -o .\testing\dateiListe_d_og_sorted.txt -c .\testing\dateiListe_d_sorted_50_prec.txt" --cleanup "curl.exe -s -X DELETE -k http://localhost:9200/clean_test"
+
+hyperfine --warmup 1 --runs 15 --export-json .\testing\results\results_windows_d_updater_25_perc.json `
+	--prepare "curl.exe -s -X DELETE -k http://localhost:9200/clean_test" `
+	".\executables\Release\typefinderV4.exe -s ./settings/settings.toml -t D:\ " `
+	" .\executables\Release\updater -s .\settings\settings.toml -o .\testing\dateiListe_d_og_sorted.txt -c .\testing\dateiListe_d_sorted_25_prec.txt"

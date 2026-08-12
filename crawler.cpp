@@ -95,12 +95,6 @@ int main(int argc, char *argv[])
         std::lock_guard<std::mutex> lock(vector_mutex);
         path_vector.push_back(path);
         file_count++;
-        // FIXME: Too simple. What happens when less than BATCH_SIZE files? How to know when last path
-        // if (path_vector.size() >= BATCH_SIZE){
-        //     // std::cout << "Sending batch of data." << std::endl;
-        //     send_data(path_vector);
-        //     path_vector.clear();
-        // }
     };
 
     argparse::ArgumentParser program("Crawler");
@@ -146,8 +140,8 @@ int main(int argc, char *argv[])
         cb.wait_all();
         // std::cout << "Found all files.\n";
         // either write to file or send to server
-        send_files_to_server();
-        // write_files_for_updater();
+        // send_files_to_server();
+        write_files_for_updater();
 
         std::cout << "Amount of files: " << file_count << std::endl;
         auto t2 = std::chrono::high_resolution_clock::now();
