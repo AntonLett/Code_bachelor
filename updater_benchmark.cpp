@@ -234,6 +234,11 @@ BENCHMARK_F(UpdaterFixture, BM_SendData)(benchmark::State &state)
         const std::string done_message = std::to_string(DONE) + " Done\n";
         Client *client = Client::getClientInstance("127.0.0.1", "8085");
         client->sendMessage(done_message);
+
+        state.PauseTiming();
+        send_data(created, DELETE);
+        client->sendMessage(done_message);
+        state.ResumeTiming();
     }
 }
 
