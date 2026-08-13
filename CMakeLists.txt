@@ -8,12 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/executables)
 
 # =============================================================================
 # libCZI (NICHT in vcpkg verfügbar -> bleibt FetchContent)
 # =============================================================================
 include(FetchContent)
+set(LIBCZI_BUILD_UNITTESTS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     libCZI
     GIT_REPOSITORY https://github.com/ZEISS/libczi.git
@@ -25,6 +25,9 @@ FetchContent_MakeAvailable(libCZI)
 # Abhängigkeiten via vcpkg (find_package)
 # =============================================================================
 # vcpkg stellt diese Pakete bereit, sobald die Toolchain geladen ist.
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/executables)
+
 find_package(benchmark CONFIG REQUIRED)
 find_package(argparse CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -81,3 +84,25 @@ target_link_libraries(updater PRIVATE
     argparse::argparse
     benchmark::benchmark
 )
+
+# =============================================================================
+# Executable: Benchmark Crawler
+# =============================================================================
+add_executable(benchmark_crawler
+    crawler_benchmark.cpp
+)
+target_link_libraries(benchmark_crawler PRIVATE
+    benchmark::benchmark
+)
+target_include_directories(benchmark_crawler PRIVATE ${CMAKE_SOURCE_DIR})
+
+# =============================================================================
+# Executable: Benchmark updater
+# =============================================================================
+add_executable(updater_benchmark
+    updater_benchmark.cpp
+)
+target_link_libraries(updater_benchmark PRIVATE
+    benchmark::benchmark
+)
+target_include_directories(updater_benchmark PRIVATE ${CMAKE_SOURCE_DIR})

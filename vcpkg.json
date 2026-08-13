@@ -1,7 +1,7 @@
 {
   "name": "metadata-extractor",
   "version": "1.0.0",
-  "builtin-baseline": "aae277acf4e7de287ddb5e208b5316614de6aad7",
+  "builtin-baseline": "ea1a7396b05637a53bf23c078647ecc0edee4b80",
   "dependencies": [
     "benchmark",
     "argparse",

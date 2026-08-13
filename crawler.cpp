@@ -135,13 +135,13 @@ int main(int argc, char *argv[])
         auto t1 = std::chrono::high_resolution_clock::now();
 
         // Crawl directory, then wait for all processes to finish
-        CrawlerBase<decltype(my_processor)> cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
+        CrawlerBase cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
         cb.start_crawl_pool();
         cb.wait_all();
         // std::cout << "Found all files.\n";
         // either write to file or send to server
-        // send_files_to_server();
-        write_files_for_updater();
+        send_files_to_server();
+        // write_files_for_updater();
 
         std::cout << "Amount of files: " << file_count << std::endl;
         auto t2 = std::chrono::high_resolution_clock::now();

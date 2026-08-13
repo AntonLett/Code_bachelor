@@ -1,0 +1,39 @@
+{
+  "context": {
+    "date": "2026-08-13T06:06:53+02:00",
+    "host_name": "DESKTOP-F85NAQK",
+    "executable": "C:\\Users\\Mein\\Documents\\Uni\\Code_bachelor\\executables\\Release\\updater_benchmark.exe",
+    "num_cpus": 6,
+    "mhz_per_cpu": 3696,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 9437184,
+        "num_sharing": 6
+      }
+    ],
+    "load_avg": [],
+    "library_version": "v1.9.5",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [

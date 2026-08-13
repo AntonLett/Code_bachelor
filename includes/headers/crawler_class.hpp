@@ -18,7 +18,7 @@ public:
     void start_crawl_pool();
 };
 
-CrawlerBase::CrawlerBase(std::string folder, std::function<void(const std::string &)> processor, size_t num_threads_crawl, size_t num_threads_task) : folder_to_search_in{folder}, processor{proc}, pool_crawler{num_threads_crawl}, pool_task{num_threads_task} {}
+CrawlerBase::CrawlerBase(std::string folder, std::function<void(const std::string &)> processor, size_t num_threads_crawl, size_t num_threads_task) : folder_to_search_in{folder}, processor{processor}, pool_crawler{num_threads_crawl}, pool_task{num_threads_task} {}
 
 void CrawlerBase::crawl_directory(std::string dir_path)
 {
