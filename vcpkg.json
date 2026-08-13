@@ -1,7 +1,16 @@
 {
-    "name": "typefinderproject",
-    "version-string": "1.0.0",
-    "dependencies": [
-        "exiv2"
-    ]
+  "name": "metadata-extractor",
+  "version": "1.0.0",
+  "builtin-baseline": "aae277acf4e7de287ddb5e208b5316614de6aad7",
+  "dependencies": [
+    "benchmark",
+    "argparse",
+    "zlib",
+    "boost-asio",
+    "boost-beast",
+    "boost-system",
+    "boost-algorithm",
+    "exiv2",
+    "simdjson"
+  ]
 }
