@@ -84,7 +84,7 @@ bool readLine(std::ifstream &file, basicFileInfo &fi, char delimValue = ';', cha
 
         while (std::getline(ss, token, delimValue))
         {
-            tokens.push_back(token);
+            fi.mdata.push_back(token);
         }
     }
     else
@@ -238,20 +238,26 @@ int main(int argc, char **argv)
         // auto t2 = std::chrono::high_resolution_clock::now();
         // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
         // std::cout << "Comparing took: " << ms_double.count() << " ms\n";
-
+        /*
         for (auto &a : created){
             if(!a.empty()){
                 std::cout << a.length();
                 a.pop_back();
                 std::cout << a.length();
             }
-        }
-        send_data(created, CREATE);
-        // send_data(deleted, DELETE);
-        
-        const std::string done_message = std::to_string(DONE) + " Done\n";
-        Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
-        client->sendMessage(done_message);
+        }*/
+        // if(!created.empty()){
+        //    send_data(created, CREATE);
+        // }
+        // if(!deleted.empty()){
+            // send_data(deleted, DELETE);
+        // }
+        // if(!altered.empty()){
+            // send_data(altered, MODIFY)
+        // }
+        // const std::string done_message = std::to_string(DONE) + " Done\n";
+        // Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
+        // client->sendMessage(done_message);
 
         // printToFile("updater_files/created", created, 1);
         // printToFile("updater_files/deleted", deleted, 2);

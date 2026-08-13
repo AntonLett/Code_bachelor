@@ -1,4 +1,4 @@
-$lines = Get-Content .\testing\lists\new_og_d.txt
+$lines = Get-Content .\testing\lists\350k_list
 
 $items = foreach ($line in $lines) {
     [PSCustomObject]@{
@@ -15,4 +15,4 @@ $items = foreach ($line in $lines) {
     })
 )
 
-$items.Line | Set-Content .\testing\lists\new_og_d_sorted.txt
+$items.Line | Set-Content .\testing\lists\350k_list_sorted

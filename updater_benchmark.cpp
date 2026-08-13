@@ -80,7 +80,7 @@ bool readLine(std::ifstream &file, basicFileInfo &fi, char delimValue = ';', cha
 
         while (std::getline(ss, token, delimValue))
         {
-            tokens.push_back(token);
+            fi.mdata.push_back(token);
         }
     }
     else
@@ -219,6 +219,9 @@ BENCHMARK_F(UpdaterFixture, BM_Compare)(benchmark::State &state)
 {
     for (auto _ : state)
     {
+        state.PauseTiming();
+        created.clear();
+        state.ResumeTiming();
         sortFile(cur);
         readFile(old, cur, created);
     }

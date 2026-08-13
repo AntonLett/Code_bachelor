@@ -1,4 +1,4 @@
-$Pfad = "D:\"
+$Pfad = "D:\bachelor_tests_foldersize\350k"
 $Fehler_Log = ".\testing\fehler_log"
 
 Get-ChildItem -Path $Pfad -Recurse -File -ErrorVariable AccessErrors -ErrorAction SilentlyContinue |
