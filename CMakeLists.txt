@@ -54,10 +54,27 @@ target_link_libraries(crawler PRIVATE
 # =============================================================================
 # HINWEIS: Bei vcpkg simdjson muss man die .cpp Datei meist NICHT mehr kompilieren.
 # Man linkt einfach gegen die Library.
-add_executable(server
+set(SERVER_SOURCES
     server.cpp
-    # includes/code/simdjson.cpp  <-- ENTFERNEN, wenn vcpkg simdjson genutzt wird
 )
+
+# ExifTool nur einbinden, wenn das Betriebssystem NICHT Windows ist
+if(NOT WIN32)
+    list(APPEND SERVER_SOURCES
+        includes/exiftool/src/ExifTool.cpp
+        includes/exiftool/src/ExifToolPipe.cpp
+        includes/exiftool/src/TagInfo.cpp
+    )
+endif()
+
+add_executable(server ${SERVER_SOURCES})
+
+if(NOT WIN32)
+    target_include_directories(server PUBLIC
+        includes/exiftool/inc
+    )
+endif()
+
 target_link_libraries(server PRIVATE
     Threads::Threads
     libCZI

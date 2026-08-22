@@ -10,24 +10,13 @@
 #include <ctime>
 #include <chrono>
 #include <tuple>
-#include <functional>
 #include <string>
 #include <codecvt>
-#include <exiv2/exiv2.hpp>
 #include "xml2json.hpp"
 #include "hal.hpp"
-// #include "../exiftool/inc/ExifTool.h"
 #include "check_if_quotes_needed.hpp"
 
 namespace fs = std::filesystem;
-
-// Source - https://cplusplus.com/reference/functional/hash/
-// Retrieved 2026-08-07
-std::string getHash(std::string s)
-{
-    std::hash<std::string> h;
-    return std::to_string(h(s));
-}
 
 /**
  * The Extractor classes implement different interfaces to extract metadata from given files.
@@ -245,7 +234,6 @@ public:
 /**
  * Exiftool Extractor inheriting from Extractor implements a call to exiftool to extract metadata from given files.
  */
-/*
 class Exiftool_Extractor : public Extractor
 {
 public:
@@ -256,205 +244,18 @@ public:
     }
     std::string extract(const std::string &path) override
     {
-        std::string result{};
-        ExifTool *et = new ExifTool();
-        std::string metadata = "";
-        const char *file_path = path.c_str();
-        int cmdNum = et->ExtractInfo(file_path, "-File:all\n-s\n-a\n-FileGroupID\n");
-
-        TagInfo *info = et->GetInfo(cmdNum, 1);
-
-        if (info)
-        {
-            // print returned information
-            for (TagInfo *i = info; i; i = i->next)
-            {
-                std::string val = needsQuotes(std::string(i->value));
-                metadata += "\"" + std::string(i->name) + "\": " + val;
-                if (i->next)
-                    metadata += ",";
-                else
-                    metadata += "";
-            }
-            result = metadata;
-            delete info;
-        }
-        else if (et->LastComplete() <= 0)
-        {
-            std::cerr << path << std::endl;
-            std::cerr << ("Error executing exiftool!\n");
-            std::cerr << "File might be too large, consider increasing timeout duration.\n";
-        }
-        // print exiftool stderr messages
-        char *err = et->GetError();
-        if (err)
-        {
-            throw std::runtime_error(std::string(err));
-        }
-        delete et; // delete our ExifTool object
-        return result;
+        return extractExif(path);
     }
 
     std::vector<std::tuple<std::string, std::string>> extract(const std::vector<std::string> &paths) override
     {
-        std::vector<std::tuple<std::string, std::string>> results;
-        ExifTool *et = new ExifTool();
-        for (std::string fp : paths)
-        {
-            std::string id = getHash(fp);
-            std::string metadata = "";
-            const char *file_path = fp.c_str();
-            int cmdNum = et->ExtractInfo(file_path, "-File:all\n-s\n-a\n-FileGroupID\n");
-
-            TagInfo *info = et->GetInfo(cmdNum, 1);
-
-            if (info)
-            {
-                // print returned information
-                for (TagInfo *i = info; i; i = i->next)
-                {
-                    std::string val = needsQuotes(std::string(i->value));
-                    metadata += "\"" + std::string(i->name) + "\": " + val;
-                    if (i->next)
-                        metadata += ",";
-                    else
-                        metadata += "";
-                }
-                results.push_back(std::tuple(id, metadata));
-                delete info;
-            }
-            else if (et->LastComplete() <= 0)
-            {
-                std::cout << fp << std::endl
-                          << std::endl;
-                std::cerr << ("Error executing exiftool!\n");
-                std::cerr << "File might be too large, consider increasing timeout duration.\n";
-            }
-            // print exiftool stderr messages
-            char *err = et->GetError();
-            if (err)
-            {
-                throw std::runtime_error(std::string(err));
-            }
-        }
-        delete et; // delete our ExifTool object
-        return results;
+        return extractExif(paths);
     }
 
     Exiftool_Extractor(std::vector<std::string> vs) : Extractor(vs)
     {
         this->name = "Exiftool";
         registerExtractor();
-    }
-};*/
-
-class Exiv2_Extractor : public Extractor
-{
-public:
-    void registerExtractor()
-    {
-        Registry *reg = Registry::getRegistry();
-        reg->Registry::addToRegistry(supported_types, this);
-    }
-
-    Exiv2_Extractor(std::vector<std::string> vs) : Extractor(vs) 
-    {
-        this->name = "Exiv2";
-        registerExtractor();
-    }
-
-    template <typename T>
-    void read_metadata(const T &data, std::string &md)
-    {
-        auto end = data.end();
-        for (auto i = data.begin(); i != end; ++i)
-        {
-            md += "\"" + i->key() + "\": ";
-            if (i->typeName() == "SHORT" || i->typeName() == "LONG")
-            {
-                md += i->value().toString();
-            }
-            else
-            {
-                md += "\"" + i->value().toString() + "\"";
-            }
-            if (std::next(i) != end)
-            {
-                md += ",";
-            }
-        }
-    }
-
-    std::vector<std::tuple<std::string, std::string>>
-    extract(const std::vector<std::string> &paths) override
-    {
-        std::vector<std::tuple<std::string, std::string>> results;
-        for (const auto &fp : paths)
-        {
-            // Source - https://exiv2.org/examples.html
-            // Accessed: 08.08.2026
-            std::string id = getHash(fp);
-            Exiv2::Image::UniquePtr image = Exiv2::ImageFactory::open(fp);
-            if (!image)
-            {
-                std::cerr << "Cannot open file: " << fp << std::endl;
-                continue;
-            }
-            image->readMetadata();
-
-            Exiv2::ExifData &exifData = image->exifData();
-            Exiv2::IptcData &iptcData = image->iptcData();
-            Exiv2::XmpData &xmpData = image->xmpData();
-            std::string md = "";
-            if (!exifData.empty())
-            {
-                read_metadata(exifData, md);
-                md += ",";
-            }
-            if (!iptcData.empty())
-            {
-                read_metadata(iptcData, md);
-                md += ",";
-            }
-            if (!xmpData.empty())
-                read_metadata(xmpData, md);
-            md += "\n";
-            results.push_back(std::tuple(id, md));
-        }
-        return results;
-    }
-
-    std::string extract(const std::string &path) override
-    {
-        // Source - https://exiv2.org/examples.html
-        // Accessed: 08.08.2026
-        std::string id = getHash(path);
-        Exiv2::Image::UniquePtr image = Exiv2::ImageFactory::open(path);
-        if (!image)
-        {
-            std::cerr << "Cannot open file: " << path << std::endl;
-            return "";
-        }
-        image->readMetadata();
-
-        Exiv2::ExifData &exifData = image->exifData();
-        Exiv2::IptcData &iptcData = image->iptcData();
-        Exiv2::XmpData &xmpData = image->xmpData();
-        std::string md = "";
-        if (!exifData.empty())
-        {
-            read_metadata(exifData, md);
-            md += ",";
-        }
-        if (!iptcData.empty())
-        {
-            read_metadata(iptcData, md);
-            md += ",";
-        }
-        if (!xmpData.empty())
-            read_metadata(xmpData, md);
-        md += "\n";
-        return md;
     }
 };
 

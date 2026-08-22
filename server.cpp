@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 #include <unordered_map>
 #include <vector>
-// #include "includes/exiftool/inc/ExifTool.h"
 #include "includes/headers/POST_Request.hpp"
 #include "includes/headers/check_if_quotes_needed.hpp"
 #include "includes/headers/settings_reader.hpp"
@@ -179,21 +178,25 @@ void handle_done(const std::vector<std::string> &paths)
     std::filesystem::path p = "./testing/results/extraction_times_" + std::to_string(done_counter) + ".txt";
     std::ofstream file;
     file.open(p);
-    if(!file.is_open()){
+    if (!file.is_open())
+    {
         std::cerr << Color::error_message() << "Cannot open file: " << p << "\n";
         exit(1);
     }
-    for(const auto& a : extract_time){
+    for (const auto &a : extract_time)
+    {
         file << a << std::endl;
     }
     std::filesystem::path p2 = "./testing/results/opensearch_times_" + std::to_string(done_counter) + ".txt";
     std::ofstream file2;
     file2.open(p2);
-    if(!file2.is_open()){
+    if (!file2.is_open())
+    {
         std::cerr << Color::error_message() << "Cannot open file2: " << p << "\n";
         exit(1);
     }
-    for(const auto& a : post_time){
+    for (const auto &a : post_time)
+    {
         file2 << a << std::endl;
     }
     ++done_counter;
@@ -399,13 +402,19 @@ int main(int argc, char **argv)
 
         // settings for extractors
         const auto EXTRACTOR_SETTINGS = toml::find(settings, "extractors");
-        // std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
-        std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
-        std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
+
+#if defined(unix)
+        std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
+        Exiftool_Extractor exiftool_extractor(exiftool_types);
+#else
         std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
-        // Exiftool_Extractor exiftool_extractor(exiftool_types);
-        CZI_Extractor czi(czi_types);
         Exiv2_Extractor exiv2_extractor(exiv2_types);
+#endif
+
+        std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
+        CZI_Extractor czi(czi_types);
+
+        std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
         FilesystemInfo_Extractor fie(fie_types);
 
         // starting server
