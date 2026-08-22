@@ -7,3 +7,5 @@ updater_files/
 testing/lists/
 vcpkg_installed/
 updater_files_new
+.venv/
+plots/
