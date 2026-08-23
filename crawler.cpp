@@ -26,7 +26,7 @@ void send_data(const std::vector<std::string> &paths)
     unsigned short try_count = 0;
     Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
     std::string message = "";
-    for (const std::string path : paths)
+    for (const std::string &path : paths)
     {
         std::string next_path = std::to_string(CREATE) + " " + path + "\n";
         if ((message + next_path).length() > MAX_SIZE)
@@ -63,7 +63,6 @@ void send_files_to_server()
 {
     if (!path_vector.empty())
     {
-        std::cout << "Vector not empty yet, sending data." << std::endl;
         send_data(path_vector);
         path_vector.clear();
     }

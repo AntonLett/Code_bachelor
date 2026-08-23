@@ -164,7 +164,6 @@ void handle_modify(const std::vector<std::string> &paths)
     }
     pr.send_post(modify_messages);
     std::string answer = pr.receive_answer();
-    std::cout << answer << std::endl;
     std::string em = get_opensearch_error_message(answer);
     if (em != "")
     {

@@ -183,7 +183,7 @@ std::string getOwnerInfo(const std::string &path)
     struct group *group = getgrgid(file_stat.st_gid);
     result += "\"Group\": \"";
     result += (group ? group->gr_name : "unknown");
-    result += "\"";
+    result += "\",";
 
     return result;
 }
