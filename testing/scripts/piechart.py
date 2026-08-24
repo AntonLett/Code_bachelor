@@ -23,7 +23,8 @@ def read_data_from_file(filename):
         line = line.strip()
         if ':' in line and line:
             key, value = line.split(':', 1)
-            data[key.strip()] = int(value.strip())
+            if int(value.strip()) >= 150: 
+                data[key.strip()] = int(value.strip())
     
     return data
 
