@@ -78,18 +78,26 @@ public:
         {
             boost::asio::streambuf buf;
             boost::system::error_code error;
-            boost::asio::read_until(socket, buf, "\n");
+            boost::asio::read_until(socket, buf, "\n", error);
 
             if (error == boost::asio::error::eof)
             {
-                return std::string(boost::asio::buffer_cast<const char *>(buf.data()), buf.size());
+                std::istream stream(&buf);
+                return std::string(
+                    std::istreambuf_iterator<char>(stream),
+                    std::istreambuf_iterator<char>()
+            );
             }
             else if (error)
             {
                 throw boost::system::system_error(error);
             }
 
-            return std::string(boost::asio::buffer_cast<const char *>(buf.data()), buf.size());
+            std::istream stream(&buf);
+            return std::string(
+                std::istreambuf_iterator<char>(stream),
+                std::istreambuf_iterator<char>()
+            );
         }
         catch (const std::exception &e)
         {

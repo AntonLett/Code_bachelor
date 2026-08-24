@@ -1,0 +1,16 @@
+{
+  "name": "metadata-extractor",
+  "version": "1.0.0",
+  "builtin-baseline": "ea1a7396b05637a53bf23c078647ecc0edee4b80",
+  "dependencies": [
+    "benchmark",
+    "argparse",
+    "zlib",
+    "boost-asio",
+    "boost-beast",
+    "boost-system",
+    "boost-algorithm",
+    "exiv2",
+    "simdjson"
+  ]
+}

@@ -1,0 +1,586 @@
+{
+  "body": {
+    "took": 3,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 1,
+        "relation": "eq"
+      },
+      "max_score": 1,
+      "hits": [
+        {
+          "_index": "clean_test",
+          "_id": "3882083635794467606",
+          "_score": 1,
+          "_source": {
+            "FileSize": 7395712,
+            "LastWrite": "2026-08-22T20:54:34+0200",
+            "FileStatus": "rw-rw-r--",
+            "FilePath": "testing/files/Image_1_2023_08_18__14_32_31_964(1).czi",
+            "FileOwner": "joe",
+            "Group": "joe",
+            "ImageDocument": {
+              "Metadata": {
+                "Version": "1.0",
+                "Information": {
+                  "User": {
+                    "DisplayName": "tala"
+                  },
+                  "Document": {
+                    "Name": "Image_1_2023_08_18__14_32_31_964",
+                    "Description": null,
+                    "Comment": "Light sheet thickness: 14.07 µm\nIllumination mode: single\nPivot scan: off\nZ-Stack mode: Stepper mode\nTiles overlap: 10.0 %\nTrack switch mode: Frame Fast\n\nLaser blocking filter:\nFW1 : LBF 405/488/561/638\n\nEmission selection:\nCAM BS : Mirror\n",
+                    "UserName": "tala",
+                    "CreationDate": "2023-08-18T16:32:32",
+                    "SubType": "Image",
+                    "Rating": "0",
+                    "Title": "Image_1_2023_08_18__14_32_31_964"
+                  },
+                  "Image": {
+                    "Session": {
+                      "@SessionId": "F70193D8-F29B-4F58-A7A6-98F3C4A9F7F8",
+                      "@SessionName": "Lightsheet - 20230818_162606",
+                      "@SessionCreation": "Uncalibrated"
+                    },
+                    "OriginalScanData": "true",
+                    "PixelType": "Gray16",
+                    "ComponentBitCount": "16",
+                    "SizeX": "1920",
+                    "SizeY": "1920",
+                    "SizeM": "4",
+                    "MicroscopeRef": {
+                      "@Id": "Microscope:0"
+                    },
+                    "ObjectiveSettings": {
+                      "ObjectiveRef": {
+                        "@Id": "Objective:0"
+                      },
+                      "Medium": "User Medium",
+                      "RefractiveIndex": "1.53"
+                    },
+                    "MicroscopeSettings": {
+                      "ZoomSettings": {
+                        "Magnification": "1"
+                      }
+                    },
+                    "Dimensions": {
+                      "Channels": {
+                        "Channel": {
+                          "@Id": "361603404611391247941050478985941578120",
+                          "@Name": "Cam1",
+                          "IlluminationType": "Oblique",
+                          "ContrastMethod": "Fluorescence",
+                          "DetectionWavelength": {
+                            "SinglePeak": "10"
+                          },
+                          "EmissionWavelength": "10",
+                          "AcquisitionMode": "SPIM",
+                          "ExposureTime": "30000000",
+                          "ChannelType": "Unspecified",
+                          "SPIMIlluminationSettings": {
+                            "NALightSheet": "0.013003221532028613"
+                          },
+                          "SPIMDetectionSettings": {
+                            "NADetection": "0.1200806268132936"
+                          },
+                          "DetectorSettings": {
+                            "Detector": {
+                              "@Id": "Detector:0:0"
+                            },
+                            "Binning": "1x1",
+                            "PhotonConversionFactor": "0",
+                            "Gain": "0",
+                            "DigitalGain": "0",
+                            "Offset": "0.10000000000000001"
+                          },
+                          "FilterSet": {
+                            "@Id": "FilterSet:0:0:0"
+                          },
+                          "AiryscanSettings": {
+                            "Mode": "Off",
+                            "VirtualPinholeSize": "1",
+                            "Magnification": "1",
+                            "TransformationXX": "0",
+                            "TransformationXY": "0",
+                            "TransformationYX": "0",
+                            "TransformationYY": "0"
+                          }
+                        }
+                      },
+                      "Tracks": {
+                        "Track": {
+                          "@Id": "Track:0",
+                          "ChannelRefs": {
+                            "ChannelRef": {
+                              "@Id": "361603404611391247941050478985941578120"
+                            }
+                          }
+                        }
+                      },
+                      "T": {
+                        "StartTime": "2023-08-18T16:32:32",
+                        "Positions": {
+                          "BinaryList": {
+                            "AttachmentName": "TimeStamps"
+                          }
+                        }
+                      },
+                      "I": {
+                        "StartPosition": "0",
+                        "Positions": {
+                          "Interval": {
+                            "Start": "90",
+                            "Increment": "180"
+                          }
+                        }
+                      },
+                      "S": {
+                        "Scenes": {
+                          "Scene": {
+                            "@Index": "0",
+                            "Positions": {
+                              "Position": {
+                                "@X": "3.14935e-311",
+                                "@Y": "5.06911e-320",
+                                "@Z": "0"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "Instrument": {
+                    "@Id": "Instrument:0",
+                    "Microscopes": {
+                      "Microscope": {
+                        "@Id": "Microscope:0",
+                        "System": "Lightsheet Z.1"
+                      }
+                    },
+                    "Detectors": {
+                      "Detector": {
+                        "@Id": "Detector:0:0",
+                        "Gain": "1",
+                        "Zoom": "1",
+                        "AmplificationGain": "0",
+                        "Manufacturer": {
+                          "Model": "pco.edge 5.5"
+                        },
+                        "Type": "Camera"
+                      }
+                    },
+                    "Objectives": {
+                      "Objective": {
+                        "@Id": "Objective:0",
+                        "Immersion": "User Medium",
+                        "LensNA": "0.12000000000000002",
+                        "NominalMagnification": "5",
+                        "Manufacturer": {
+                          "Model": "Fluar 2.5x/0.12 (User Medium : n=1.530)"
+                        }
+                      }
+                    },
+                    "Filters": {
+                      "Filter": {
+                        "@Id": "Filter:0:0:0",
+                        "@Name": "None"
+                      }
+                    },
+                    "FilterSets": {
+                      "FilterSet": {
+                        "@Id": "FilterSet:0:0:0",
+                        "EmissionFilters": {
+                          "EmissionFilterRef": {
+                            "@Id": "Filter:0:0:0"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "Application": {
+                    "Name": "AIMApplication",
+                    "Version": "9.3.6.393"
+                  }
+                },
+                "DisplaySetting": {
+                  "Channels": {
+                    "Channel": {
+                      "@Id": "361603404611391247941050478985941578120",
+                      "@Name": "Cam1",
+                      "ColorMode": "Color",
+                      "Low": "-0",
+                      "High": "1",
+                      "Gamma": "1",
+                      "IsSelected": "true",
+                      "ChannelUnit": {
+                        "FactorI": "1",
+                        "OffsetI": "0",
+                        "UnitI": "Unknown",
+                        "ChannelType": "Unspecified"
+                      },
+                      "Color": "#FFFFFF"
+                    }
+                  }
+                },
+                "Scaling": {
+                  "Items": {
+                    "Distance": [
+                      {
+                        "@Id": "X",
+                        "Value": "1.822076407116043e-006"
+                      },
+                      {
+                        "@Id": "Y",
+                        "Value": "1.822076407116043e-006"
+                      },
+                      {
+                        "@Id": "Z",
+                        "Value": "0"
+                      }
+                    ]
+                  }
+                },
+                "Layers": null,
+                "Appliances": {
+                  "Appliance": {
+                    "@Id": "ShuttleAndFind:1",
+                    "Data": {
+                      "ShuttleAndFindData": {
+                        "Calibration": {
+                          "Markers": {
+                            "Marker": [
+                              {
+                                "@Id": "Marker:1",
+                                "@StageXPosition": "0",
+                                "@StageYPosition": "0",
+                                "@FocusPosition": "0"
+                              },
+                              {
+                                "@Id": "Marker:2",
+                                "@StageXPosition": "0",
+                                "@StageYPosition": "0",
+                                "@FocusPosition": "0"
+                              },
+                              {
+                                "@Id": "Marker:3",
+                                "@StageXPosition": "0",
+                                "@StageYPosition": "0",
+                                "@FocusPosition": "0"
+                              }
+                            ]
+                          },
+                          "StageOrientation": {
+                            "@Y": "-1",
+                            "@X": "1",
+                            "@Exchange": "1"
+                          },
+                          "MicroscopeType": "LM"
+                        }
+                      },
+                      "Lightsheet": {
+                        "Processing": {
+                          "MaximumIntensityProjection": {
+                            "Range": null,
+                            "Step": null
+                          }
+                        },
+                        "Acquisition": {
+                          "Streaming": {
+                            "@SeparateFiles": "M"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "CustomAttributes": {
+                  "LsmTag": [
+                    {
+                      "#text": "-0.10040000000000004",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZRight.405",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "0",
+                      "@Name": "CarlZeissAim.IncubatorState.Actual_CO2_Module",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "0.24020000000000008",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZRight.561",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "0.24020000000000008",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZRight.488",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "14.073435536666617",
+                      "@Name": "LightSheetThickness",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "false",
+                      "@Name": "CarlZeissAim.IncubatorState.Switch_CO2_Module",
+                      "@Type": "boolean"
+                    },
+                    {
+                      "#text": "10",
+                      "@Name": "CarlZeissAim.IncubatorState.Actual_TempChannel1",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "0.20710000000000009",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZLeft.638",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "0.15050000000000005",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZLeft.405",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "false",
+                      "@Name": "CarlZeissAim.IncubatorState.Switch_TempChannel1",
+                      "@Type": "boolean"
+                    },
+                    {
+                      "#text": "-0.21580000000000008",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZLeft.561",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "-0.21580000000000008",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZLeft.488",
+                      "@Type": "double"
+                    },
+                    {
+                      "#text": "-0.14240000000000005",
+                      "@Name": "CarlZeissAim.LightSheetOffsetZRight.638",
+                      "@Type": "double"
+                    }
+                  ]
+                },
+                "Experiment": {
+                  "ExperimentBlockIndex": "0",
+                  "ExperimentBlocks": {
+                    "AcquisitionBlock": {
+                      "AcquisitionModeSetup": {
+                        "BiDirectional": "true",
+                        "BiDirectionalZ": "false",
+                        "BitsPerSample": "16",
+                        "LightSheetMode": "0",
+                        "LightSheetDirection": "0",
+                        "LightSheetDualSideProcessing": "0",
+                        "CameraBinning": "1",
+                        "CameraFrameHeight": "1920",
+                        "CameraFrameOffsetX": "0",
+                        "CameraFrameOffsetY": "0",
+                        "CameraFrameWidth": "1920",
+                        "CameraSuperSampling": "0",
+                        "DimensionT": "10",
+                        "DimensionX": "512",
+                        "DimensionY": "512",
+                        "DimensionZ": "21",
+                        "FilterMethod": "Average",
+                        "FilterMode": "Frame",
+                        "FilterSamplingNumber": "1",
+                        "FitFramesizeToRoi": "false",
+                        "HdrEnabled": "false",
+                        "HdrImagingMode": "0",
+                        "HdrIntensity": "1",
+                        "HdrNumFrames": "1",
+                        "InterpolationY": "1",
+                        "Objective": "Fluar 2.5x/0.12",
+                        "OffsetX": "0",
+                        "OffsetY": "0",
+                        "OffsetZ": "0.0050214978379999999",
+                        "ReferenceZ": "0.0049999549999999995",
+                        "PixelPeriod": "1.6060606060615405e-006",
+                        "Rotation": "0",
+                        "AcquisitionMode": "Frame",
+                        "RtBinning": "1",
+                        "RtFrameHeight": "512",
+                        "RtFrameWidth": "512",
+                        "RtLinePeriod": "3.0000000000000001e-005",
+                        "RtOffsetX": "0",
+                        "RtOffsetY": "0",
+                        "RtRegionHeight": "512",
+                        "RtRegionWidth": "512",
+                        "RtSuperSampling": "1",
+                        "RtZoom": "1",
+                        "ScalingX": "1.822076407116043e-006",
+                        "ScalingY": "1.822076407116043e-006",
+                        "ScalingZ": "2.280516e-006",
+                        "SimRotations": "3",
+                        "TimeSeries": "false",
+                        "TrackMultiplexType": "FrameFast",
+                        "UseRois": "false",
+                        "ZoomX": "1",
+                        "ZoomY": "1",
+                        "PreScan": "false",
+                        "FocusStabilizer": "false"
+                      },
+                      "TimeSeriesSetup": {
+                        "StartMode": {
+                          "DigitalOut": null,
+                          "Manual": null
+                        },
+                        "StopMode": {
+                          "DigitalOut": null,
+                          "Manual": null
+                        }
+                      },
+                      "ZStackSetup": {
+                        "StackBrightnessCorrection": "false",
+                        "StackBrightnessCorrections": {
+                          "Positions": null,
+                          "Extrapolate": "false",
+                          "Interpolation": "Cubic"
+                        }
+                      },
+                      "MultiTrackSetup": {
+                        "TrackSetup": {
+                          "@Name": "Track1",
+                          "BeamSplitters": {
+                            "BeamSplitter": [
+                              {
+                                "Identifier": "MainBeamSplitterNonDescanned",
+                                "Filter": "LBF 405/488/561/638",
+                                "BeamSplitterServoPosition": "0"
+                              },
+                              {
+                                "Identifier": "CameraBeamSplitter",
+                                "Filter": "Mirror",
+                                "BeamSplitterServoPosition": "0"
+                              },
+                              {
+                                "Identifier": "BeamSplitterInvalid",
+                                "Filter": null,
+                                "BeamSplitterServoPosition": "-1"
+                              }
+                            ]
+                          },
+                          "BleachSetup": null,
+                          "Detectors": {
+                            "Detector": {
+                              "@Name": "Camera",
+                              "@Id": "361603404611391247941050478985941578120",
+                              "DetectorIdentifier": "CameraMonochrome1",
+                              "PureRatioSource": "false",
+                              "ImageChannelName": "Cam1",
+                              "Voltage": "0",
+                              "AmplifierGain": "0",
+                              "AmplifierOffset": "0.10000000000000001",
+                              "PinholeDiameter": "0",
+                              "SpectralScanChannels": "32",
+                              "Dye": null,
+                              "Folder": null,
+                              "Palette": "LsmDetectorPalette_0_0",
+                              "Color": "#FFFFFF",
+                              "DetectorMode": "Integration",
+                              "DigitalGain": "1",
+                              "DigitalOffset": "0",
+                              "LaserSuppression": "true",
+                              "Filtersets": {
+                                "Filterset": "None"
+                              },
+                              "AiryScanMode": "Off",
+                              "AiryScanVirtualPinholeSize": "1",
+                              "AiryScanMagnification": "1",
+                              "AiryScanTransformationXX": "0",
+                              "AiryScanTransformationXY": "0",
+                              "AiryScanTransformationYX": "0",
+                              "AiryScanTransformationYY": "0"
+                            }
+                          },
+                          "CenterWavelength": "0",
+                          "CondensorFrontlensPosition": "-1",
+                          "CondensorRevolverFilter": null,
+                          "TubeLensPosition": null,
+                          "FieldStopPosition": "-1",
+                          "CondensorAperture": "-1",
+                          "FilterTransmission": "-1",
+                          "CameraIntegrationTime": "0.029999999999999999",
+                          "DeviceMode": "SPIM",
+                          "TransmittedLightLampIntensity": "0",
+                          "ReflectedLightLampIntensity": "0",
+                          "LaserSuppressionMode": "None",
+                          "TirfAngle": "0",
+                          "PalmSlider": "true",
+                          "SimGratingPeriod": "0",
+                          "FWLive405Position": null,
+                          "FWFOVPosition": null
+                        }
+                      },
+                      "TilesSetup": {
+                        "PositionGroups": {
+                          "PositionGroup": {
+                            "AutoFocusMode": "Off",
+                            "AutoFocusOffset": "0",
+                            "TileAcquisitionMode": "CenteredGrid",
+                            "TilesX": "2",
+                            "TilesY": "2",
+                            "TileAcquisitionOverlap": "0.10000000000000001"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "statusCode": 200,
+  "headers": {
+    "x-opensearch-version": "OpenSearch/3.7.0 (opensearch)",
+    "content-type": "application/json; charset=UTF-8",
+    "content-length": "9086"
+  },
+  "meta": {
+    "context": null,
+    "request": {
+      "params": {
+        "method": "GET",
+        "path": "/_search",
+        "querystring": "",
+        "body": "",
+        "headers": {
+          "user-agent": "opensearch-js/3.5.1 (linux 6.8.0-136-generic-x64; Node.js v22.23.2)"
+        },
+        "timeout": 30000
+      },
+      "options": {},
+      "id": 24
+    },
+    "name": "opensearch-js",
+    "connection": {
+      "url": "http://localhost:9200/clean_test",
+      "id": "http://localhost:9200/clean_test",
+      "headers": {},
+      "deadCount": 0,
+      "resurrectTimeout": 0,
+      "_openRequests": 0,
+      "status": "alive",
+      "roles": {
+        "data": true,
+        "ingest": true
+      }
+    },
+    "attempts": 0,
+    "aborted": false
+  }
+}

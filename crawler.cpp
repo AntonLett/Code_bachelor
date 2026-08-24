@@ -26,16 +26,16 @@ void send_data(const std::vector<std::string> &paths)
     unsigned short try_count = 0;
     Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
     std::string message = "";
-    for (const std::string path : paths)
+    for (const std::string &path : paths)
     {
         std::string next_path = std::to_string(CREATE) + " " + path + "\n";
         if ((message + next_path).length() > MAX_SIZE)
         {
             response = client->sendMessage(message);
-            if (response != "ERROR sending failed")
+            /*if (response != "ERROR sending failed")
             {
                 std::cout << Color::info_message() << response << std::endl;
-            }
+            }*/
             message = "";
         }
         message += next_path;
@@ -63,7 +63,6 @@ void send_files_to_server()
 {
     if (!path_vector.empty())
     {
-        std::cout << "Vector not empty yet, sending data." << std::endl;
         send_data(path_vector);
         path_vector.clear();
     }
@@ -95,12 +94,6 @@ int main(int argc, char *argv[])
         std::lock_guard<std::mutex> lock(vector_mutex);
         path_vector.push_back(path);
         file_count++;
-        // FIXME: Too simple. What happens when less than BATCH_SIZE files? How to know when last path
-        // if (path_vector.size() >= BATCH_SIZE){
-        //     // std::cout << "Sending batch of data." << std::endl;
-        //     send_data(path_vector);
-        //     path_vector.clear();
-        // }
     };
 
     argparse::ArgumentParser program("Crawler");
@@ -141,7 +134,7 @@ int main(int argc, char *argv[])
         auto t1 = std::chrono::high_resolution_clock::now();
 
         // Crawl directory, then wait for all processes to finish
-        CrawlerBase<decltype(my_processor)> cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
+        CrawlerBase cb(target_folder, my_processor, n_proc_crawl, n_proc_task);
         cb.start_crawl_pool();
         cb.wait_all();
         // std::cout << "Found all files.\n";

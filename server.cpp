@@ -1,6 +1,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
+#include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -8,7 +10,6 @@
 #include <sys/stat.h>
 #include <unordered_map>
 #include <vector>
-#include "includes/exiftool/inc/ExifTool.h"
 #include "includes/headers/POST_Request.hpp"
 #include "includes/headers/check_if_quotes_needed.hpp"
 #include "includes/headers/settings_reader.hpp"
@@ -30,6 +31,10 @@ std::string OS_HOST;
 std::string OS_PORT;
 std::string OS_INDEX;
 std::string URL_PATH;
+
+// benchmarking
+std::vector<long long> post_time{}, extract_time{};
+int done_counter = 0;
 
 void handle_create(const std::vector<std::string> &paths);
 void handle_delete(const std::vector<std::string> &paths);
@@ -54,18 +59,20 @@ void handle_create(const std::vector<std::string> &paths)
     // sort files by extension
     for (const std::filesystem::path &fp : paths)
     {
-        std::string ext = fp.extension();
+        std::string ext = fp.extension().string();
+        std::string fp_string = fp.string();
         if (ext.empty())
         {
-            extension_map["empty"].push_back(fp);
+            extension_map["empty"].push_back(fp_string);
         }
         else
         {
-            extension_map[ext].push_back(fp);
+            extension_map[ext].push_back(fp_string);
         }
     }
 
     // pass files to extractors, based on extension
+    auto t1 = std::chrono::high_resolution_clock::now();
     for (const auto &[extension, files_with_extension] : extension_map)
     {
         std::vector<Extractor *> vExtractor = reg->getExtractors(extension);
@@ -88,6 +95,8 @@ void handle_create(const std::vector<std::string> &paths)
     }
     // wait for all extractors to finish, so the results can be combined
     extraction_pool->wait();
+    extract_time.push_back((std::chrono::high_resolution_clock::now() - t1).count());
+    t1 = std::chrono::high_resolution_clock::now();
     if (result_map.empty())
     {
         std::cerr << Color::colorize("Empty metadata vector. Probably error in use_extractor.", Color::RED) << std::endl;
@@ -105,9 +114,9 @@ void handle_create(const std::vector<std::string> &paths)
         pr.send_post(all_files);
         std::string answer = pr.receive_answer();
         std::string em = get_opensearch_error_message(answer);
-        if (em != "")
+        if (!em.empty())
         {
-            std::cout << Color::warning_message(all_files);
+            // std::cout << Color::warning_message(all_files);
             std::cout << Color::warning_message("OpenSearch Error: ") << em << std::endl
                       << std::endl;
         }
@@ -117,6 +126,7 @@ void handle_create(const std::vector<std::string> &paths)
         std::cerr << Color::MAGENTA << "ERROR IN HANDLE_CREATE" << Color::RESET << std::endl;
         std::cerr << e.what() << std::endl;
     }
+    post_time.push_back((std::chrono::high_resolution_clock::now() - t1).count());
 }
 void handle_delete(const std::vector<std::string> &paths)
 {
@@ -131,7 +141,6 @@ void handle_delete(const std::vector<std::string> &paths)
     }
     pr.send_post(delete_messages);
     std::string answer = pr.receive_answer();
-    std::cout << answer << std::endl;
     std::string em = get_opensearch_error_message(answer);
     if (em != "")
     {
@@ -155,7 +164,6 @@ void handle_modify(const std::vector<std::string> &paths)
     }
     pr.send_post(modify_messages);
     std::string answer = pr.receive_answer();
-    std::cout << answer << std::endl;
     std::string em = get_opensearch_error_message(answer);
     if (em != "")
     {
@@ -165,7 +173,32 @@ void handle_modify(const std::vector<std::string> &paths)
 
 void handle_done(const std::vector<std::string> &paths)
 {
-    std::cout << "Done." << std::endl;
+    // std::cout << "Done." << std::endl;
+    std::filesystem::path p = "./testing/results/extraction_times_" + std::to_string(done_counter) + ".txt";
+    std::ofstream file;
+    file.open(p);
+    if (!file.is_open())
+    {
+        std::cerr << Color::error_message() << "Cannot open file: " << p << "\n";
+        exit(1);
+    }
+    for (const auto &a : extract_time)
+    {
+        file << a << std::endl;
+    }
+    std::filesystem::path p2 = "./testing/results/opensearch_times_" + std::to_string(done_counter) + ".txt";
+    std::ofstream file2;
+    file2.open(p2);
+    if (!file2.is_open())
+    {
+        std::cerr << Color::error_message() << "Cannot open file2: " << p << "\n";
+        exit(1);
+    }
+    for (const auto &a : post_time)
+    {
+        file2 << a << std::endl;
+    }
+    ++done_counter;
 }
 
 bool handle_message(std::string message)
@@ -368,13 +401,19 @@ int main(int argc, char **argv)
 
         // settings for extractors
         const auto EXTRACTOR_SETTINGS = toml::find(settings, "extractors");
+
+#if defined(unix)
         std::vector<std::string> exiftool_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Exif");
-        std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
-        std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
-        std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
         Exiftool_Extractor exiftool_extractor(exiftool_types);
-        CZI_Extractor czi(czi_types);
+#else
+        std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
         Exiv2_Extractor exiv2_extractor(exiv2_types);
+#endif
+
+        std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");
+        CZI_Extractor czi(czi_types);
+
+        std::vector<std::string> fie_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "Fileinfo");
         FilesystemInfo_Extractor fie(fie_types);
 
         // starting server
