@@ -25,14 +25,14 @@ if __name__ == "__main__":
     #######################################################
     # SETTINGS
     #######################################################
-    targetFolder = "performance_comparison/"   #### MODIFY 
-    outputName = "updater_aenderungsgrad.pgf"
+    targetFolder = "hirarchy_tests/"   #### MODIFY 
+    outputName = "crawler_flachTief.pgf"
     x_label = ""
     y_label = 'Ausf"uhrdauer (s)'
-    title = 'Vergleich "Anderungen erkennen gegen Daten versenden'
+    title = 'Vergleich 131k Dateien tief gegen flach'
     folder_path = Path("testing/results/" + targetFolder)
-    files = ["res_new_0.json", "res_new_25.json", "res_new_50.json", "res_new_75.json", "res_new_100.json", "res_new_crawler.json"]
-    names = ["0\%", "25\%", "50\%", "75\%", "100\%", "Crawler"]
+    files = ["131k_deep.json", "131k_flat.json"]
+    names = ["Tiefe Ordner", "Flache Ordner"]
 
 
     content = []
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # Plot
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.bar(names, means, yerr=stddevs, capsize=5, alpha=0.8, color=["teal", "teal", "teal", "teal", "chocolate"])
-    # ax.axvline(x=2.5, color='gray', linestyle='--', linewidth=2, label='Größen-Sprung')
-    ax.axvline(x=4.5, color='gray', linestyle='--', linewidth=2, label='Größen-Sprung')
+    ax.axvline(x=2.5, color='gray', linestyle='--', linewidth=2, label='Größen-Sprung')
+    ax.axvline(x=3.5, color='gray', linestyle='--', linewidth=2, label='Größen-Sprung')
 
 
     if x_label != "":

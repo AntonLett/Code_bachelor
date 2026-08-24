@@ -12,7 +12,7 @@
 #include "includes/headers/toml.hpp"
 #include "includes/headers/helper_functions.hpp"
 #if defined(_WIN32)
-#include "includes/headers/hal.hpp"
+#include "includes/headers/crawler_helper.hpp" 
 #elif defined(unix)
 #include <sys/stat.h>
 #include <ctime>
@@ -107,9 +107,8 @@ int main(int argc, char *argv[])
     auto my_processor = [&](const std::string &path)
     {
 #if defined(_WIN32)
-        std::string oi = getOwner(path);
-        std::string gi = getGroup(path);
-        std::string metadata_info_path = oi + ";" + gi + ";" + time_to_string(std::filesystem::last_write_time(path)) + ";" + std::to_string(std::filesystem::file_size(path)) + " -- " + path;
+        OwnerGroup ownerGroup = getOwnerAndGroup(path);
+        
 #elif defined(unix)
         struct stat file_info;
         if (stat(path.c_str(), &file_info) != 0)
@@ -118,9 +117,9 @@ int main(int argc, char *argv[])
         int64_t ctime_timestamp = static_cast<int64_t>(file_info.st_ctime);
         std::string metadata_info_path = std::to_string(ctime_timestamp) + ";" + std::to_string(std::filesystem::file_size(path)) + " -- " + path;
 #endif
-        std::lock_guard<std::mutex> lock(vector_mutex);
-        path_vector.push_back(metadata_info_path);
-        file_count++;
+      std::lock_guard<std::mutex> lock(vector_mutex);
+        path_vector.push_back(path);
+        file_count++;  
     };
 
     argparse::ArgumentParser program("Crawler");
