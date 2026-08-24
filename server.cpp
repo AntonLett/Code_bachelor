@@ -407,7 +407,7 @@ int main(int argc, char **argv)
         Exiftool_Extractor exiftool_extractor(exiftool_types);
 #else
         std::vector<std::string> exiv2_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "EXIV2");
-        Exiv2_Extractor exiv2_extractor(exiv2_types);
+        Exiftool_Extractor exiv2_extractor(exiv2_types);
 #endif
 
         std::vector<std::string> czi_types = toml::find<std::vector<std::string>>(EXTRACTOR_SETTINGS, "CZI");

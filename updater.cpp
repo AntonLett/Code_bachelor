@@ -15,6 +15,7 @@ std::string SERVER_PORT{};
 std::string SERVER_IP{};
 std::vector<std::string> created, deleted, altered;
 const size_t MAX_SIZE = 4096;
+std::vector<std::string> fileContent{};
 
 struct basicFileInfo
 {
@@ -177,23 +178,32 @@ void printToFile(const std::string &fileName, const std::vector<std::string> &da
     }
 }
 
-void sortFile(const std::filesystem::path &fileName){
+void sortFile(const std::filesystem::path &fileName)
+{
     std::ifstream file(fileName);
-    std::vector<std::string> lines;
     std::string line;
 
-    while (std::getline(file, line)){
-        lines.push_back(line);
+    while (std::getline(file, line))
+    {
+        fileContent.push_back(line);
     }
     file.close();
-    std::sort( lines.begin(), lines.end(),
-        [](const std::string& a, const std::string& b){
-            return a.substr(a.find(" -- ") + 4) < b.substr(b.find(" -- ") + 4);
+    std::sort(fileContent.begin(), fileContent.end(),
+              [](const std::string &a, const std::string &b)
+              {
+                  return a.substr(a.find(" -- ") + 4) < b.substr(b.find(" -- ") + 4);
+              });
+}
+
+void save_file()
+{
+    if (!fileContent.empty())
+    {
+        std::ofstream ofile("updater_files_old");
+        for (const std::string &l : fileContent)
+        {
+            ofile << l << "\n";
         }
-    );
-    std::ofstream ofile(fileName);
-    for(const std::string& l : lines){
-        ofile << l << "\n";
     }
 }
 
@@ -234,6 +244,7 @@ int main(int argc, char **argv)
 
         sortFile(cur);
         readFile(old, cur);
+        save_file();
 
         // auto t2 = std::chrono::high_resolution_clock::now();
         // std::chrono::duration<long double, std::milli> ms_double = t2 - t1;
@@ -250,10 +261,10 @@ int main(int argc, char **argv)
         //    send_data(created, CREATE);
         // }
         // if(!deleted.empty()){
-            // send_data(deleted, DELETE);
+        // send_data(deleted, DELETE);
         // }
         // if(!altered.empty()){
-            // send_data(altered, MODIFY)
+        // send_data(altered, MODIFY)
         // }
         // const std::string done_message = std::to_string(DONE) + " Done\n";
         // Client *client = Client::getClientInstance(SERVER_IP, SERVER_PORT);
@@ -266,7 +277,8 @@ int main(int argc, char **argv)
         // ms_double = t2 - t1;
         // std::cout << "Including writing to file it took: " << ms_double.count() << " ms\n";
     }
-    catch(std::exception& e){
+    catch (std::exception &e)
+    {
         std::cerr << Color::error_message() << e.what() << std::endl;
     }
     catch (...)

@@ -10,6 +10,13 @@
 #include "includes/headers/protocol.h"
 #include "includes/headers/color_print.hpp"
 #include "includes/headers/toml.hpp"
+#include "includes/headers/helper_functions.hpp"
+#if defined(_WIN32)
+#include "includes/headers/hal.hpp"
+#elif defined(unix)
+#include <sys/stat.h>
+#include <ctime>
+#endif
 
 std::string SERVER_PORT{};
 std::string SERVER_IP{};
@@ -79,10 +86,18 @@ void write_files_for_updater()
 {
     if (!path_vector.empty())
     {
-        std::ofstream output_file("./updater_files_new");
+        std::ofstream *output_file = nullptr;
+        std::ifstream oldFile("./updater_files_old");
+        if (oldFile.good())
+        {
+            output_file = new std::ofstream("./updater_files_new");
+        }
+        else
+            output_file = new std::ofstream("./updater_files_old");
 
-        std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+        std::ostream_iterator<std::string> output_iterator(*output_file, "\n");
         std::copy(std::begin(path_vector), std::end(path_vector), output_iterator);
+        delete output_file;
     }
 }
 
@@ -91,8 +106,20 @@ int main(int argc, char *argv[])
 
     auto my_processor = [&](const std::string &path)
     {
+#if defined(_WIN32)
+        std::string oi = getOwner(path);
+        std::string gi = getGroup(path);
+        std::string metadata_info_path = oi + ";" + gi + ";" + time_to_string(std::filesystem::last_write_time(path)) + ";" + std::to_string(std::filesystem::file_size(path)) + " -- " + path;
+#elif defined(unix)
+        struct stat file_info;
+        if (stat(path.c_str(), &file_info) != 0)
+        {
+        }
+        int64_t ctime_timestamp = static_cast<int64_t>(file_info.st_ctime);
+        std::string metadata_info_path = std::to_string(ctime_timestamp) + ";" + std::to_string(std::filesystem::file_size(path)) + " -- " + path;
+#endif
         std::lock_guard<std::mutex> lock(vector_mutex);
-        path_vector.push_back(path);
+        path_vector.push_back(metadata_info_path);
         file_count++;
     };
 
@@ -139,8 +166,8 @@ int main(int argc, char *argv[])
         cb.wait_all();
         // std::cout << "Found all files.\n";
         // either write to file or send to server
-        send_files_to_server();
-        // write_files_for_updater();
+        // send_files_to_server();
+        write_files_for_updater();
 
         std::cout << "Amount of files: " << file_count << std::endl;
         auto t2 = std::chrono::high_resolution_clock::now();

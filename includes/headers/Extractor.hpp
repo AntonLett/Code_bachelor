@@ -15,6 +15,7 @@
 #include "xml2json.hpp"
 #include "hal.hpp"
 #include "check_if_quotes_needed.hpp"
+#include "helper_functions.hpp"
 
 namespace fs = std::filesystem;
 
@@ -22,22 +23,6 @@ namespace fs = std::filesystem;
  * The Extractor classes implement different interfaces to extract metadata from given files.
  * The Registry class implements a singleton design pattern, collecting all activated extractors and sorts them by their supported file types.
  */
-
-// Source - https://stackoverflow.com/a/58237530
-// Posted by Gulrak, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-05-11, License - CC BY-SA 4.0
-template <typename TP>
-std::string time_to_string(TP tp)
-{
-    using namespace std::chrono;
-    auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
-    std::time_t tt = system_clock::to_time_t(sctp);
-    std::tm *local_time = std::localtime(&tt);
-    std::stringstream buffer;
-    // buffer << std::put_time(local_time, "%A, %d %B %Y %H:%M");
-    buffer << std::put_time(local_time, "%Y-%m-%dT%H:%M:%S%z");
-    return buffer.str();
-}
 
 // Source - https://en.cppreference.com/cpp/filesystem/file_status/permissions
 // Last accessed: 12. Mai 2026 - 10:30 Uhr
