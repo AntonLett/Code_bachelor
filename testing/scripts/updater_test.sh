@@ -25,9 +25,6 @@ for i in $(seq $max); do
     echo "--- Durchlauf $i ---" >> $results
     { time $executable $input1 $input2; } 2>> $results
     echo "" >> $results
-    
-    # Optional: Cache zwischen Durchläufen leeren (nur mit sudo!)
-    # sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
 done
 
 echo "Ende: $(date)" >> $results

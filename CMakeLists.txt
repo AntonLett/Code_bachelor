@@ -92,7 +92,7 @@ target_include_directories(server PRIVATE ${simdjson_INCLUDE_DIR})
 # Executable: Updater
 # =============================================================================
 add_executable(updater
-    list_compare.cpp
+    updater.cpp
 )
 target_link_libraries(updater PRIVATE
     Boost::asio

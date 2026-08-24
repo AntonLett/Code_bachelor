@@ -88,7 +88,6 @@ public:
         path_vector.clear();
         file_count = 0;
 
-        // Lambda in std::function verpacken
         std::function<void(const std::string &)> my_processor =
             [this](const std::string &path)
         {
@@ -115,8 +114,7 @@ BENCHMARK_DEFINE_F(CrawlerFixture, BM_Crawl)(benchmark::State &state)
         path_vector.clear();
         file_count = 0;
 
-        // Crawl ausführen (z.B. via run() oder im Konstruktor)
-        cb->start_crawl_pool(); // oder whatever Methode den Crawl startet
+        cb->start_crawl_pool();
         cb->wait_all();
 
         // Verhindern, dass der Compiler optimiert
