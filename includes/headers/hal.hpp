@@ -27,7 +27,33 @@ std::string getHash(std::string s)
 
 #pragma comment(lib, "advapi32.lib")
 
-std::string getOwnerInfo(const std::string &path)
+std::string lookupSidName(PSID pSid)
+{
+    if (pSid == NULL)
+        return "unknown";
+
+    WCHAR acctName[256], domainName[256];
+    DWORD dwAcctName = 256, dwDomainName = 256;
+    SID_NAME_USE eUse = SidTypeUnknown;
+
+    if (LookupAccountSidW(NULL, pSid, acctName, &dwAcctName, domainName, &dwDomainName, &eUse))
+    {
+        std::wstring fullName = std::wstring(domainName) + L"\\" + std::wstring(acctName);
+
+        // UTF-16 zu UTF-8 konvertieren
+        int size = WideCharToMultiByte(CP_UTF8, 0, fullName.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        std::string result(size - 1, 0);
+        WideCharToMultiByte(CP_UTF8, 0, fullName.c_str(), -1, &result[0], size, nullptr, nullptr);
+        return result;
+    }
+    else
+    {
+        std::cerr << "Error in LookupAccountSid: " << GetLastError() << std::endl;
+    }
+    return "unknown";
+};
+
+std::string getOwner(const std::string &path)
 {
     PSID pSidOwner = NULL;
     PSECURITY_DESCRIPTOR pSD = NULL;
@@ -39,51 +65,68 @@ std::string getOwnerInfo(const std::string &path)
     if (result != ERROR_SUCCESS)
     {
         std::cerr << "Error when accessing Security Information: " << result << std::endl;
-        return "\"FileOwner\": \"unknown\"";
+        return "\"unknown\"";
     }
 
-    // Translate SID to readable name (User, Domain)
-    WCHAR acctName[256], domainName[256];
-    DWORD dwAcctName = 256, dwDomainName = 256;
-    SID_NAME_USE eUse = SidTypeUnknown;
-
-    if (LookupAccountSidW(NULL, pSidOwner, acctName, &dwAcctName, domainName, &dwDomainName, &eUse))
-    {
-        // Type conversions
-        int size = WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            acctName,
-            -1,
-            nullptr,
-            0,
-            nullptr,
-            nullptr);
-        std::string acct(size - 1, 0);
-        WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            acctName,
-            -1,
-            &acct[0],
-            size,
-            nullptr,
-            nullptr);
-
-        if (pSD != NULL)
-            LocalFree(pSD);
-        return "\"FileOwner\": \"" + acct + "\"";
-    }
-    else
-    {
-        std::cerr << "Error in LookupAccountSid: " << GetLastError() << std::endl;
-    }
-
+    std::string owner = lookupSidName(pSidOwner);
     // Free the allocated descriptor
     if (pSD != NULL)
         LocalFree(pSD);
-    return "\"FileOwner\": \"unknown\"";
+    return owner;
 }
+
+std::string getGroup(const std::string &path)
+{
+    PSID pSidGroup = NULL;
+    PSECURITY_DESCRIPTOR pSD = NULL;
+
+    DWORD result = GetNamedSecurityInfoA(
+        path.c_str(), SE_FILE_OBJECT, GROUP_SECURITY_INFORMATION,
+        NULL, &pSidGroup, NULL, NULL, &pSD);
+
+    if (result != ERROR_SUCCESS)
+    {
+        std::cerr << "Error when accessing Security Information: " << result << std::endl;
+        return "\"unknown\"";
+    }
+
+    std::string group = lookupSidName(pSidGroup);
+    // Free the allocated descriptor
+    if (pSD != NULL)
+        LocalFree(pSD);
+
+    return group;
+}
+
+std::string getOwnerInfo(const std::string &path)
+{
+    std::string owner = getOwner(path);
+    std::string group = getGroup(path);
+    return "\"FileOwner\": \"" + owner + "\", \"Group\": \"" + group + "\",";
+}
+
+
+template <typename T>
+    void read_metadata(const T &data, std::string &md)
+    {
+        auto end = data.end();
+        for (auto i = data.begin(); i != end; ++i)
+        {
+            md += "\"" + i->key() + "\": ";
+            if (i->typeName() == "SHORT" || i->typeName() == "LONG")
+            {
+                md += i->value().toString();
+            }
+            else
+            {
+                md += "\"" + i->value().toString() + "\"";
+            }
+            if (std::next(i) != end)
+            {
+                md += ",";
+            }
+        }
+    }
 
 std::vector<std::tuple<std::string, std::string>> extractExif(const std::vector<std::string> &paths)
 {
@@ -161,6 +204,7 @@ std::string extractExif(const std::string &path)
 #include <grp.h>
 #include <sys/stat.h>
 #include "../exiftool/inc/ExifTool.h"
+#include "check_if_quotes_needed.hpp"
 
 // Source: https://chat-ai.academiccloud.de/chat/9280e65b-6ed3-466b-a5d4-9f50afcdda64
 // ChatAI Mistral Large 3 675N Instruct 2512 - Chat: C++ ACL File Reading - Abgefrage: 12. Mai 2026

@@ -20,6 +20,8 @@ FetchContent_Declare(
     GIT_TAG        main
 )
 FetchContent_MakeAvailable(libCZI)
+set(LIBCZI_INCLUDE_DIR ${libCZI_SOURCE_DIR}/Src/libCZI)
+
 
 # =============================================================================
 # Abhängigkeiten via vcpkg (find_package)
@@ -46,8 +48,11 @@ target_link_libraries(crawler PRIVATE
     libCZI
     Boost::asio
     argparse::argparse
+    Exiv2::exiv2lib
     benchmark::benchmark
 )
+
+target_include_directories(crawler PRIVATE ${libCZI_SOURCE_DIR})
 
 # =============================================================================
 # Executable: server
@@ -72,21 +77,21 @@ add_executable(server ${SERVER_SOURCES})
 if(NOT WIN32)
     target_include_directories(server PUBLIC
         includes/exiftool/inc
-    )
-endif()
-
-target_link_libraries(server PRIVATE
-    Threads::Threads
-    libCZI
-    Boost::asio
-    Boost::beast
-    Boost::system
-    Exiv2::exiv2lib
-    argparse::argparse
-    benchmark::benchmark
-    simdjson::simdjson
-)
-target_include_directories(server PRIVATE ${simdjson_INCLUDE_DIR})
+        )
+        endif()
+        
+        target_link_libraries(server PRIVATE
+        Threads::Threads
+        libCZI
+        Boost::asio
+        Boost::beast
+        Boost::system
+        Exiv2::exiv2lib
+        argparse::argparse
+        benchmark::benchmark
+        simdjson::simdjson
+        )
+        target_include_directories(server PRIVATE ${simdjson_INCLUDE_DIR} ${libCZI_SOURCE_DIR})
 
 # =============================================================================
 # Executable: Updater
@@ -105,7 +110,7 @@ target_link_libraries(updater PRIVATE
 # =============================================================================
 # Executable: Benchmark Crawler
 # =============================================================================
-add_executable(benchmark_crawler
+add_executable(benchmark_crawler 
     crawler_benchmark.cpp
 )
 target_link_libraries(benchmark_crawler PRIVATE
@@ -113,6 +118,7 @@ target_link_libraries(benchmark_crawler PRIVATE
 )
 target_include_directories(benchmark_crawler PRIVATE ${CMAKE_SOURCE_DIR})
 
+target_include_directories(crawler PRIVATE ${libCZI_SOURCE_DIR})
 # =============================================================================
 # Executable: Benchmark updater
 # =============================================================================
