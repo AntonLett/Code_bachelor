@@ -204,6 +204,7 @@ void save_file()
         {
             ofile << l << "\n";
         }
+        std::cout << "Writing done." << std::endl;
     }
 }
 
